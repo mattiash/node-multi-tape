@@ -1,0 +1,18 @@
+{
+  "name": "multi-tape",
+  "version": "1.0.0",
+  "description": "Runner for tape-tests",
+  "bin": {
+    "multi-tape": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mattias Holmlund <mattias.git@holmlund.se>",
+  "license": "MIT",
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "tap-parser": "^1.2.2",
+    "tee": "^0.2.0"
+  }
+}
