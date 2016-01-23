@@ -37,3 +37,8 @@ used more than once.
 - -p=X Run X tests in parallel. If X > 1, the output from each test is buffered
 until the test is finished. Without this, the output from different tests would
 be mixed.
+
+## Exit code
+
+multi-tape exits with code 1 if any test failed as shown by the tap-results or
+if any test-script exited with a non-zero code.
