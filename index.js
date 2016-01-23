@@ -11,11 +11,13 @@ var argv = require('minimist')(process.argv.slice(2),{
 
 var parser = require('tap-parser')
 var tee = require('tee')
+var streams = require('memory-streams')
 var spawn = require('child_process').spawn
 var fs = require('fs')
 
 var results = {}
 var exitCodes = {}
+var outputs = {}
 
 var nodeArgs = []
 if(argv['node-arg']) {
@@ -59,29 +61,48 @@ function runTest(filename) {
         });
     })
 
+    var output
+
     var parsed = new Promise(function(resolve) {
         var p = parser( resolve );
-
-        console.log('')
-        console.log('#')
-        console.log('# ' + filename)
-        console.log('#')
-
-        if(argv.o) {
-
-            proc.stdout.pipe(tee(p, fs.createWriteStream(filename + '.tap') ))
-                .pipe(process.stdout)
+        if(argv.p === 1) {
+            output = process.stdout
         }
         else {
-            proc.stdout.pipe(tee(p)).pipe(process.stdout)
+            output = new streams.WritableStream()
         }
-        proc.stderr.pipe(process.stderr)
+
+        output.write('\n#\n# ' + filename + '\n#\n')
+
+        if(argv.o) {
+            proc.stdout.pipe(tee(p, fs.createWriteStream(filename + '.tap') ))
+                .pipe(output)
+        }
+        else {
+            proc.stdout.pipe(tee(p)).pipe(output)
+        }
+        proc.stderr.pipe(output)
     })
 
     return Promise.all([exited, parsed]).then(function(values) {
         exitCodes[filename] = values[0]
         results[filename] = values[1]
+        if( argv.p > 1 ) {
+            outputs[filename] = output.toString()
+            console.log(outputs[filename])
+        }
+
     }).catch(console.dir)
+}
+
+function streamToString(stream, cb) {
+    const chunks = [];
+    stream.on('data', (chunk) => {
+        chunks.push(chunk);
+    });
+    stream.on('end', () => {
+        cb(chunks.join(''));
+    });
 }
 
 function printSummary() {

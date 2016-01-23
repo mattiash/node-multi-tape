@@ -33,3 +33,7 @@ STDOUT.
 
 - --node-arg=--opt Send an option to node when invoking the test-file. Can be
 used more than once.
+
+- -p=X Run X tests in parallel. If X > 1, the output from each test is buffered
+until the test is finished. Without this, the output from different tests would
+be mixed.

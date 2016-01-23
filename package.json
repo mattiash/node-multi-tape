@@ -11,6 +11,7 @@
   "author": "Mattias Holmlund <mattias.git@holmlund.se>",
   "license": "MIT",
   "dependencies": {
+    "memory-streams": "^0.1.0",
     "minimist": "^1.2.0",
     "tap-parser": "^1.2.2",
     "tee": "^0.2.0"
