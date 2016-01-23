@@ -1,7 +1,12 @@
 #! /usr/bin/env node
 
+'use strict'
+
 var argv = require('minimist')(process.argv.slice(2),{
-    boolean: ['o']
+    boolean: ['o'],
+    default: {
+        p: 1
+    }
 })
 
 var parser = require('tap-parser')
@@ -22,21 +27,31 @@ if(argv['node-arg']) {
     }
 }
 
-runTests(argv._.sort())
+var files = argv._.sort()
 
-function runTests(files) {
+// Start argv.p tests in parallel
+let runners = []
+for(let n=0; n<argv.p; n++) {
+    runners.push(runTests())
+}
+
+Promise.all( runners )
+  .then(printSummary).catch(console.dir)
+
+function runTests() {
     if(files.length) {
-        var file = files.shift()
-        runTest(file, function(res) {
-            runTests(files)
+        return new Promise(function(resolve) {
+            var file = files.shift()
+            resolve(runTest(file).then(runTests))
         })
     }
     else {
-        printSummary()
+        return Promise.resolve(true)
     }
 }
 
-function runTest(filename, cb) {
+// Returns a promise that resolves whe the test has been run
+function runTest(filename) {
     var proc = spawn('node', nodeArgs.concat(filename))
     var exited = new Promise( function(resolve) {
         proc.on('exit', function (exitCode) {
@@ -63,16 +78,15 @@ function runTest(filename, cb) {
         proc.stderr.pipe(process.stderr)
     })
 
-    Promise.all([exited, parsed]).then(function(values) {
+    return Promise.all([exited, parsed]).then(function(values) {
         exitCodes[filename] = values[0]
         results[filename] = values[1]
-        cb()
     }).catch(console.dir)
 }
 
 function printSummary() {
     var success = true
-    for(file of Object.keys(results).sort()) {
+    for(let file of Object.keys(results).sort()) {
         if(exitCodes[file] !== 0) {
             success = false
             console.log(file + ' exited with error ' + exitCodes[file])
