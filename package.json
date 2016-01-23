@@ -1,6 +1,6 @@
 {
   "name": "multi-tape",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Runner for tape-tests",
   "bin": {
     "multi-tape": "index.js"
@@ -9,6 +9,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mattias Holmlund <mattias.git@holmlund.se>",
+  "bugs": {
+      "url": "https://github.com/mattiash/node-multi-tape/issues"
+  },
+  "repository" : {
+      "type" : "git",
+      "url" : "https://github.com/mattiash/node-multi-tape.git"
+  },
   "license": "MIT",
   "dependencies": {
     "memory-streams": "^0.1.0",
