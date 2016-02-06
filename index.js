@@ -2,24 +2,24 @@
 
 'use strict'
 
-var argv = require('minimist')(process.argv.slice(2),{
+const argv = require('minimist')(process.argv.slice(2),{
     boolean: ['o'],
     default: {
         p: 1
     }
 })
 
-var parser = require('tap-parser')
-var tee = require('tee')
-var streams = require('memory-streams')
-var spawn = require('child_process').spawn
-var fs = require('fs')
-var async = require('async-p')
+const parser = require('tap-parser')
+const tee = require('tee')
+const streams = require('memory-streams')
+const spawn = require('child_process').spawn
+const fs = require('fs')
+const async = require('async-p')
 
-var results = {}
-var exitCodes = {}
+let results = {}
+let exitCodes = {}
 
-var nodeArgs = []
+let nodeArgs = []
 if(argv['node-arg']) {
     if(Array.isArray(argv['node-arg'])) {
         nodeArgs = argv['node-arg']
@@ -29,26 +29,26 @@ if(argv['node-arg']) {
     }
 }
 
-var files = argv._.sort()
+let files = argv._.sort()
 
 // Start argv.p tests in parallel
 async.eachLimit(files, runTest, argv.p)
     .then(printSummary)
-    .catch(console.dir)
+    .catch(console.dir) // eslint-disable-line no-console
 
 // Returns a promise that resolves whe the test has been run
 function runTest(filename) {
-    var proc = spawn('node', nodeArgs.concat(filename))
-    var exited = new Promise( function(resolve) {
+    let proc = spawn('node', nodeArgs.concat(filename))
+    let exited = new Promise( function(resolve) {
         proc.on('exit', function (exitCode) {
             resolve(exitCode)
-        });
+        })
     })
 
-    var output
+    let output
 
-    var parsed = new Promise(function(resolve) {
-        var p = parser( resolve );
+    let parsed = new Promise(function(resolve) {
+        let p = parser( resolve )
         if(argv.p === 1) {
             output = process.stdout
         }
@@ -72,35 +72,25 @@ function runTest(filename) {
         exitCodes[filename] = values[0]
         results[filename] = values[1]
         if( argv.p > 1 ) {
-            console.log(output.toString())
+            console.log(output.toString()) // eslint-disable-line no-console
         }
 
-    }).catch(console.dir)
-}
-
-function streamToString(stream, cb) {
-    const chunks = [];
-    stream.on('data', (chunk) => {
-        chunks.push(chunk);
-    });
-    stream.on('end', () => {
-        cb(chunks.join(''));
-    });
+    }).catch(console.dir) // eslint-disable-line no-console
 }
 
 function printSummary() {
-    var success = true
+    let success = true
     for(let file of Object.keys(results).sort()) {
         if(exitCodes[file] !== 0) {
             success = false
-            console.log(file + ' exited with error ' + exitCodes[file])
+            console.log(file + ' exited with error ' + exitCodes[file]) // eslint-disable-line no-console
         }
         else {
-            var r = results[file]
+            let r = results[file]
             if( !r.ok ) {
                 success = false
             }
-            console.log(file + (r.ok ? ' ok ' : ' fail ') + r.pass + '/' + r.count)
+            console.log(file + (r.ok ? ' ok ' : ' fail ') + r.pass + '/' + r.count) // eslint-disable-line no-console
         }
     }
 

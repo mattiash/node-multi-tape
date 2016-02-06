@@ -6,7 +6,9 @@
     "multi-tape": "index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "./node_modules/.bin/eslint *.js",
+    "prepublish": "npm run lint"
   },
   "author": "Mattias Holmlund <mattias.git@holmlund.se>",
   "bugs": {
@@ -23,5 +25,8 @@
     "minimist": "^1.2.0",
     "tap-parser": "^1.2.2",
     "tee": "^0.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^1.10.3"
   }
 }
