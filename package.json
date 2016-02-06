@@ -10,14 +10,15 @@
   },
   "author": "Mattias Holmlund <mattias.git@holmlund.se>",
   "bugs": {
-      "url": "https://github.com/mattiash/node-multi-tape/issues"
+    "url": "https://github.com/mattiash/node-multi-tape/issues"
   },
-  "repository" : {
-      "type" : "git",
-      "url" : "https://github.com/mattiash/node-multi-tape.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mattiash/node-multi-tape.git"
   },
   "license": "MIT",
   "dependencies": {
+    "async-p": "^1.1.0",
     "memory-streams": "^0.1.0",
     "minimist": "^1.2.0",
     "tap-parser": "^1.2.2",

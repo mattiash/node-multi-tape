@@ -14,6 +14,7 @@ var tee = require('tee')
 var streams = require('memory-streams')
 var spawn = require('child_process').spawn
 var fs = require('fs')
+var async = require('async-p')
 
 var results = {}
 var exitCodes = {}
@@ -31,25 +32,9 @@ if(argv['node-arg']) {
 var files = argv._.sort()
 
 // Start argv.p tests in parallel
-let runners = []
-for(let n=0; n<argv.p; n++) {
-    runners.push(runTests())
-}
-
-Promise.all( runners )
-  .then(printSummary).catch(console.dir)
-
-function runTests() {
-    if(files.length) {
-        return new Promise(function(resolve) {
-            var file = files.shift()
-            resolve(runTest(file).then(runTests))
-        })
-    }
-    else {
-        return Promise.resolve(true)
-    }
-}
+async.eachLimit(files, runTest, argv.p)
+    .then(printSummary)
+    .catch(console.dir)
 
 // Returns a promise that resolves whe the test has been run
 function runTest(filename) {
