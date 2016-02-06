@@ -17,7 +17,6 @@ var fs = require('fs')
 
 var results = {}
 var exitCodes = {}
-var outputs = {}
 
 var nodeArgs = []
 if(argv['node-arg']) {
@@ -88,8 +87,7 @@ function runTest(filename) {
         exitCodes[filename] = values[0]
         results[filename] = values[1]
         if( argv.p > 1 ) {
-            outputs[filename] = output.toString()
-            console.log(outputs[filename])
+            console.log(output.toString())
         }
 
     }).catch(console.dir)
