@@ -6,7 +6,7 @@
     "multi-tape": "index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tape test/glob-test.js",
     "lint": "./node_modules/.bin/eslint *.js",
     "prepublish": "npm run lint"
   },
@@ -21,12 +21,14 @@
   "license": "MIT",
   "dependencies": {
     "async-p": "^1.1.0",
+    "glob": "^7.1.2",
     "memory-streams": "^0.1.0",
     "minimist": "^1.2.0",
     "tap-parser": "^1.2.2",
     "tee": "^0.2.0"
   },
   "devDependencies": {
-    "eslint": "^1.10.3"
+    "eslint": "^1.10.3",
+    "tape": "^4.9.0"
   }
 }
