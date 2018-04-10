@@ -33,18 +33,9 @@ if(argv['node-arg']) {
 // Use glob to parse any test file args for patterns.
 function globArgs(argv_) {
     let globbedFiles = []
-
-    if(!Array.isArray(argv_))
-    {
-        globbedFiles = glob.sync(argv_, {cwd: __dirname})
+    for (var i = 0; i < argv_.length; i++) {
+        globbedFiles = globbedFiles.concat(glob.sync(argv_[i], { cwd: __dirname }))
     }
-    else
-    {
-        for (var i = 0; i < argv_.length; i++) {
-            globbedFiles.concat(glob.sync(argv_[i], { cwd: __dirname }))
-        }
-    }
-
     return globbedFiles
 }
 module.exports.globArgs = globArgs

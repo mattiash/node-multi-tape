@@ -6,7 +6,7 @@ const multi_tape = require('../index.js')
 test('Glob parses this project\'s test/*.js', function(t) {
     t.plan(3)
 
-    let arg = "test/*.js"
+    let arg = ["test/*.js"]
     let result = multi_tape.globArgs(arg)
 
     let expected = true

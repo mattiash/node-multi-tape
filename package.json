@@ -6,7 +6,7 @@
     "multi-tape": "index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tape test/glob-test.js",
     "lint": "./node_modules/.bin/eslint *.js",
     "prepublish": "npm run lint"
   },
