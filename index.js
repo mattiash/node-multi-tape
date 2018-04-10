@@ -34,7 +34,10 @@ if(argv['node-arg']) {
 function globArgs(argv_) {
     let globbedFiles = []
     for (var i = 0; i < argv_.length; i++) {
-        globbedFiles = globbedFiles.concat(glob.sync(argv_[i], { cwd: __dirname }))
+        globbedFiles = globbedFiles.concat(glob.sync(argv_[i]))
+    }
+    if(!globbedFiles) {
+        globbedFiles = argv_
     }
     return globbedFiles
 }

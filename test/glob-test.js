@@ -22,3 +22,18 @@ test('Glob parses this project\'s test/*.js', function(t) {
     actual = result[0]
     t.equal(actual, expected, "Is result expected filename - Expected: " + expected + "; Actual: " + actual)
 })
+
+test('Glob still parses an actual file', function(t) {
+    t.plan(2)
+
+    let arg = ["test/glob-test.js"]
+    let result = multi_tape.globArgs(arg)
+
+    let expected = true
+    let actual = Array.isArray(result)
+    t.equal(Array.isArray(result), true, "Is result array - Expected: " + expected + ", Actual: " + actual)
+
+    expected = "test/" + path.basename(__filename)
+    actual = result[0]
+    t.equal(actual, expected, "Is result expected filename - Expected: " + expected + "; Actual: " + actual)
+})
