@@ -15,6 +15,7 @@ const streams = require('memory-streams')
 const spawn = require('child_process').spawn
 const fs = require('fs')
 const async = require('async-p')
+const glob = require('glob')
 
 let results = {}
 let exitCodes = {}
@@ -29,7 +30,26 @@ if(argv['node-arg']) {
     }
 }
 
-let files = argv._.sort()
+// Use glob to parse any test file args for patterns.
+function globArgs(argv_) {
+    let globbedFiles = []
+    for (var i = 0; i < argv_.length; i++) {
+
+        let globResult = glob.sync(argv_[i])
+        
+        if(globResult.length < 1) {
+            // Glob found nothing. Just add this argument as-is.
+            globbedFiles.push(argv_[i])
+        }
+        else {
+            globbedFiles = globbedFiles.concat(globResult)
+        }
+    }
+    return globbedFiles
+}
+module.exports.globArgs = globArgs
+
+let files = globArgs(argv._).sort()
 
 // Start argv.p tests in parallel
 async.eachLimit(files, runTest, argv.p)
