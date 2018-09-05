@@ -26,7 +26,7 @@ test('Glob parses this project\'s test/*.js', function(t) {
 test('Glob still parses an actual file', function(t) {
     t.plan(2)
 
-    let arg = ["test/glob-test.js"]
+    let arg = ["test/test-glob.js"]
     let result = multi_tape.globArgs(arg)
 
     let expected = true
@@ -41,7 +41,7 @@ test('Glob still parses an actual file', function(t) {
 test('A combination of different inputs', function(t) {
     t.plan(6)
 
-    let arg = ["test/glob-test.js", "test/*.js", "wibble/wibble123.example", "wibble/*.wibblet"]
+    let arg = ["test/test-glob.js", "test/*.js", "wibble/wibble123.example", "wibble/*.wibblet"]
 
     // NOTE: Wibble-related paths do not exist. These should still be passed to the test runner, 
     // in order to comply with the previous implementation.

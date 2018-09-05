@@ -6,7 +6,7 @@
     "multi-tape": "index.js"
   },
   "scripts": {
-    "test": "tape test/glob-test.js",
+    "test": "tape test/test-*.js",
     "lint": "./node_modules/.bin/eslint *.js",
     "prepublish": "npm run lint"
   },
