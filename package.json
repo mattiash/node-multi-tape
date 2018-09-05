@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "eslint": "^1.10.3",
+    "prettier": "^1.14.2",
     "tape": "^4.9.0"
   }
 }
