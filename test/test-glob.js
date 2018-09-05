@@ -2,6 +2,8 @@ const test = require('tape')
 const path = require('path')
 const multi_tape = require('../index.js')
 
+const FILES_IN_TEST_DIR = 2
+
 test("Glob parses this project's test/*.js", function(t) {
     t.plan(3)
 
@@ -16,8 +18,7 @@ test("Glob parses this project's test/*.js", function(t) {
         'Is result array - Expected: ' + expected + ', Actual: ' + actual,
     )
 
-    // TODO: There's probably an easy way to count the number of JS files in the test/ directory to make this test future-proof...
-    expected = 1
+    expected = FILES_IN_TEST_DIR
     actual = result.length
     t.equal(
         actual,
@@ -30,14 +31,7 @@ test("Glob parses this project's test/*.js", function(t) {
 
     expected = 'test/' + path.basename(__filename)
     actual = result[0]
-    t.equal(
-        actual,
-        expected,
-        'Is result expected filename - Expected: ' +
-            expected +
-            '; Actual: ' +
-            actual,
-    )
+    t.ok(result.includes(expected), 'result includes expected file')
 })
 
 test('Glob still parses an actual file', function(t) {
@@ -81,68 +75,31 @@ test('A combination of different inputs', function(t) {
 
     let result = multi_tape.globArgs(arg)
 
-    let expected = true
-    let actual = Array.isArray(result)
+    t.equal(Array.isArray(result), true, 'result is an Array')
+
+    // We're expecting 1 for each of the test-files, 1 for the explicit test-files and 2 for the wibble arguments, which will remain untouched.
     t.equal(
-        Array.isArray(result),
-        true,
-        'Is result array - Expected: ' + expected + ', Actual: ' + actual,
+        result.length,
+        FILES_IN_TEST_DIR + 3,
+        'Correct number of .js files found by glob',
     )
 
-    // We're expecting 4 - 1 for each of the "legal" files and 2 for the wibble arguments, which will remain untouched.
-    // TODO: If the number of test files changes, this test will fail...
-    expected = 4
-    actual = result.length
     t.equal(
-        actual,
-        expected,
-        'Number of .js files found by glob - Expected: ' +
-            expected +
-            ', Actual: ' +
-            actual,
+        result[0],
+        'test/' + path.basename(__filename),
+        'Expected filename first in array',
     )
 
-    expected = 'test/' + path.basename(__filename)
-    actual = result[0]
     t.equal(
-        actual,
-        expected,
-        'Is result expected filename - Expected: ' +
-            expected +
-            '; Actual: ' +
-            actual,
+        result.filter(e => e === 'test/' + path.basename(__filename)).length,
+        2,
+        'test-glob.js found twice',
     )
 
-    expected = 'test/' + path.basename(__filename)
-    actual = result[1]
-    t.equal(
-        actual,
-        expected,
-        'Is result expected filename - Expected: ' +
-            expected +
-            '; Actual: ' +
-            actual,
+    t.ok(
+        result.includes('wibble/wibble123.example'),
+        'Explicitly named file included',
     )
 
-    expected = 'wibble/wibble123.example'
-    actual = result[2]
-    t.equal(
-        actual,
-        expected,
-        'Is result expected filename - Expected: ' +
-            expected +
-            '; Actual: ' +
-            actual,
-    )
-
-    expected = 'wibble/*.wibblet'
-    actual = result[3]
-    t.equal(
-        actual,
-        expected,
-        'Is result expected filename - Expected: ' +
-            expected +
-            '; Actual: ' +
-            actual,
-    )
+    t.ok(result.includes('wibble/*.wibblet'), 'Non-matching wildcard included')
 })
