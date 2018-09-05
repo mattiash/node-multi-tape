@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.2.1] 2018-09-05
+
 ### Fixes
 
 -   Fix #3 Hangs with too much output on stdout
