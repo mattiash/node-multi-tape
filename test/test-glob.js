@@ -15,7 +15,7 @@ test("Glob parses this project's test/*.js", function(t) {
     t.equal(
         Array.isArray(result),
         true,
-        'Is result array - Expected: ' + expected + ', Actual: ' + actual,
+        'Is result array - Expected: ' + expected + ', Actual: ' + actual
     )
 
     expected = FILES_IN_TEST_DIR
@@ -26,7 +26,7 @@ test("Glob parses this project's test/*.js", function(t) {
         'Number of .js files found by glob - Expected: ' +
             expected +
             ', Actual: ' +
-            actual,
+            actual
     )
 
     expected = 'test/' + path.basename(__filename)
@@ -45,7 +45,7 @@ test('Glob still parses an actual file', function(t) {
     t.equal(
         Array.isArray(result),
         true,
-        'Is result array - Expected: ' + expected + ', Actual: ' + actual,
+        'Is result array - Expected: ' + expected + ', Actual: ' + actual
     )
 
     expected = 'test/' + path.basename(__filename)
@@ -56,7 +56,7 @@ test('Glob still parses an actual file', function(t) {
         'Is result expected filename - Expected: ' +
             expected +
             '; Actual: ' +
-            actual,
+            actual
     )
 })
 
@@ -81,24 +81,24 @@ test('A combination of different inputs', function(t) {
     t.equal(
         result.length,
         FILES_IN_TEST_DIR + 3,
-        'Correct number of .js files found by glob',
+        'Correct number of .js files found by glob'
     )
 
     t.equal(
         result[0],
         'test/' + path.basename(__filename),
-        'Expected filename first in array',
+        'Expected filename first in array'
     )
 
     t.equal(
         result.filter(e => e === 'test/' + path.basename(__filename)).length,
         2,
-        'test-glob.js found twice',
+        'test-glob.js found twice'
     )
 
     t.ok(
         result.includes('wibble/wibble123.example'),
-        'Explicitly named file included',
+        'Explicitly named file included'
     )
 
     t.ok(result.includes('wibble/*.wibblet'), 'Non-matching wildcard included')

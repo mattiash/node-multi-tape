@@ -6,8 +6,8 @@
     "multi-tape": "index.js"
   },
   "scripts": {
-    "test": "tape test/test-*.js",
-    "lint": "./node_modules/.bin/eslint *.js",
+    "test": "./index.js -p 2 test/test-*.js",
+    "lint": "prettier -l *.js test/*.js && eslint *.js",
     "prepublish": "npm run lint"
   },
   "author": "Mattias Holmlund <mattias.git@holmlund.se>",

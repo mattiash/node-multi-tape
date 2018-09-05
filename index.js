@@ -107,9 +107,10 @@ function printSummary() {
             if (!r.ok) {
                 success = false
             }
+            // eslint-disable-next-line no-console
             console.log(
-                file + (r.ok ? ' ok ' : ' fail ') + r.pass + '/' + r.count,
-            ) // eslint-disable-line no-console
+                file + (r.ok ? ' ok ' : ' fail ') + r.pass + '/' + r.count
+            )
         }
     }
 
