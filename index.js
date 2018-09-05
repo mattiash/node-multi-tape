@@ -11,7 +11,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 
 const parser = require('tap-parser')
 const tee = require('tee')
-const streams = require('memory-streams')
+const streams = require('stream-buffers')
 const spawn = require('child_process').spawn
 const fs = require('fs')
 const async = require('async-p')
@@ -70,7 +70,7 @@ function runTest(filename) {
         if (argv.p === 1) {
             output = process.stdout
         } else {
-            output = new streams.WritableStream()
+            output = new streams.WritableStreamBuffer()
         }
 
         output.write('\n#\n# ' + filename + '\n#\n')
@@ -90,7 +90,7 @@ function runTest(filename) {
             exitCodes[filename] = values[0]
             results[filename] = values[1]
             if (argv.p > 1) {
-                console.log(output.toString()) // eslint-disable-line no-console
+                console.log(output.getContentsAsString('utf8')) // eslint-disable-line no-console
             }
         })
         .catch(console.dir) // eslint-disable-line no-console
