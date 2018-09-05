@@ -1,5 +1,7 @@
 # multi-tape
 
+[![Build Status](https://travis-ci.org/mattiash/node-multi-tape.svg?branch=master)](https://travis-ci.org/mattiash/node-multi-tape)
+
 A tool for running [tape](https://github.com/substack/tape) tests in multiple files
 
 ## Background
@@ -27,16 +29,16 @@ with output sent to stdout and print a summary at the end
 
 ## Options
 
-- -o send output to one file per test-file. The output filename will be the name
-of the test-file with '.tap' appended. The result will still be printed to
-STDOUT.
+-   -o send output to one file per test-file. The output filename will be the name
+    of the test-file with '.tap' appended. The result will still be printed to
+    STDOUT.
 
-- --node-arg=--opt Send an option to node when invoking the test-file. Can be
-used more than once.
+-   --node-arg=--opt Send an option to node when invoking the test-file. Can be
+    used more than once.
 
-- -p=X Run X tests in parallel. If X > 1, the output from each test is buffered
-until the test is finished. Without this, the output from different tests would
-be mixed.
+-   -p=X Run X tests in parallel. If X > 1, the output from each test is buffered
+    until the test is finished. Without this, the output from different tests would
+    be mixed.
 
 ## Exit code
 
