@@ -9,7 +9,7 @@ const argv = require('minimist')(process.argv.slice(2), {
     },
 })
 
-const parser = require('tap-parser')
+const Parser = require('tap-parser')
 const tee = require('tee')
 const streams = require('stream-buffers')
 const spawn = require('child_process').spawn
@@ -66,7 +66,7 @@ function runTest(filename) {
     let output
 
     let parsed = new Promise(function(resolve) {
-        let p = parser(resolve)
+        let p = new Parser(resolve)
         if (argv.p === 1) {
             output = process.stdout
         } else {

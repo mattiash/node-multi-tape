@@ -1,35 +1,35 @@
 {
-  "name": "multi-tape",
-  "version": "1.2.1",
-  "description": "Runner for tape-tests",
-  "bin": {
-    "multi-tape": "index.js"
-  },
-  "scripts": {
-    "test": "./index.js -p 2 test/test-*.js",
-    "lint": "prettier -l *.js test/*.js && eslint *.js",
-    "prepublish": "npm run lint"
-  },
-  "author": "Mattias Holmlund <mattias.git@holmlund.se>",
-  "bugs": {
-    "url": "https://github.com/mattiash/node-multi-tape/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mattiash/node-multi-tape.git"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "async-p": "^1.1.0",
-    "glob": "^7.1.2",
-    "minimist": "^1.2.0",
-    "stream-buffers": "^3.0.2",
-    "tap-parser": "^1.2.2",
-    "tee": "^0.2.0"
-  },
-  "devDependencies": {
-    "eslint": "^6.0.1",
-    "prettier": "^1.18.2",
-    "tape": "^4.10.2"
-  }
+    "name": "multi-tape",
+    "version": "1.2.1",
+    "description": "Runner for tape-tests",
+    "bin": {
+        "multi-tape": "index.js"
+    },
+    "scripts": {
+        "test": "./index.js -p 2 test/test-*.js",
+        "lint": "prettier -l *.js test/*.js && eslint *.js",
+        "prepublish": "npm run lint"
+    },
+    "author": "Mattias Holmlund <mattias.git@holmlund.se>",
+    "bugs": {
+        "url": "https://github.com/mattiash/node-multi-tape/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mattiash/node-multi-tape.git"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "async-p": "^1.1.0",
+        "glob": "^7.1.4",
+        "minimist": "^1.2.0",
+        "stream-buffers": "^3.0.2",
+        "tap-parser": "^9.3.2",
+        "tee": "^0.2.0"
+    },
+    "devDependencies": {
+        "eslint": "^6.0.1",
+        "prettier": "^1.18.2",
+        "tape": "^4.10.2"
+    }
 }
