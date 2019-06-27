@@ -3,11 +3,12 @@
     "version": "1.2.1",
     "description": "Runner for tape-tests",
     "bin": {
-        "multi-tape": "index.js"
+        "multi-tape": "build/index.js"
     },
     "scripts": {
-        "test": "./index.js -p 2 test/test-*.js",
-        "lint": "prettier -l *.js test/*.js && eslint *.js",
+        "tsc": "tsc",
+        "test": "./build/index.js -p 2 build/test/test-*.js",
+        "lint": "prettier -l *.ts test/*.ts",
         "prepublish": "npm run lint"
     },
     "author": "Mattias Holmlund <mattias.git@holmlund.se>",
@@ -28,8 +29,15 @@
         "tee": "^0.2.0"
     },
     "devDependencies": {
-        "eslint": "^6.0.1",
+        "@types/glob": "^7.1.1",
+        "@types/node": "^9.4.5",
+        "@types/stream-buffers": "^3.0.3",
+        "coveralls": "^3.0.4",
+        "nyc": "^14.1.1",
         "prettier": "^1.18.2",
-        "tape": "^4.10.2"
+        "purple-tape": "^2.0.1",
+        "source-map-support": "^0.5.12",
+        "tape": "^4.10.2",
+        "typescript": "^3.5.2"
     }
 }
