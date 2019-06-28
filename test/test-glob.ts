@@ -12,13 +12,13 @@ test("Glob parses this project's test/*.ts", async t => {
     )
 })
 
-test('Glob still parses an actual file', function(t) {
+test('Glob still parses an actual file', t => {
     let arg = ['test/test-glob.ts']
     let result = globArgs(arg)
     t.deepEqual(result, arg, 'shall return the name of a file that exists')
 })
 
-test('A combination of different inputs', function(t) {
+test('A combination of different inputs', t => {
     let arg = [
         'test/test-glob.ts',
         'test/*.ts',

@@ -27,7 +27,7 @@ export async function runTest(
     const output = logConsole
         ? process.stdout
         : new streams.WritableStreamBuffer()
-    output.write('\n#\n# ' + filename + '\n#\n')
+    output.write(`\n#\n# ${filename}\n#\n`)
 
     let parsed = new Promise<any>(resolve => {
         let p = new Parser(resolve)
@@ -51,8 +51,9 @@ export async function runTest(
         )
     }
 
-    if (signal) console.log(`${filename} exited with signal ${signal}`)
-
+    if (signal) {
+        console.log(`${filename} exited with signal ${signal}`)
+    }
     return {
         exitCode,
         result,

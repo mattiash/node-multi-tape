@@ -1,13 +1,13 @@
 import * as glob from 'glob'
 
-export function globArgs(argv_: any) {
+export function globArgs(fileSpecs: string[]) {
     let globbedFiles = new Array<string>()
-    for (var i = 0; i < argv_.length; i++) {
-        let globResult = glob.sync(argv_[i])
+    for (const fileSpec of fileSpecs) {
+        let globResult = glob.sync(fileSpec)
 
         if (globResult.length < 1) {
             // Glob found nothing. Just add this argument as-is.
-            globbedFiles.push(argv_[i])
+            globbedFiles.push(fileSpec)
         } else {
             globbedFiles = globbedFiles.concat(globResult)
         }

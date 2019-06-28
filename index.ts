@@ -41,6 +41,7 @@ function printInProgress() {
 
 async function thread() {
     let file: string | undefined
+    // tslint:disable-next-line:no-conditional-assignment
     while ((file = files.shift())) {
         inProgress.add(file)
         const result = await runTest(file, nodeArgs, argv.p === 1, argv.o)
@@ -87,4 +88,4 @@ function printSummary() {
 process.on('SIGTERM', printInProgress)
 process.on('SIGINT', printInProgress)
 
-run()
+void run()

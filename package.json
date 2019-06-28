@@ -8,7 +8,7 @@
     "scripts": {
         "tsc": "tsc",
         "test": "./build/index.js -p 2 -o build/test/test-*.js",
-        "lint": "prettier -l *.ts test/*.ts",
+        "lint": "prettier -l *.ts test/*.ts && tslint -t stylish -p tsconfig.json",
         "prepublish": "npm run lint"
     },
     "author": "Mattias Holmlund <mattias.git@holmlund.se>",
@@ -37,6 +37,7 @@
         "purple-tape": "^2.0.1",
         "source-map-support": "^0.5.12",
         "tape": "^4.10.2",
+        "tslint": "^5.18.0",
         "typescript": "^3.5.2"
     }
 }
