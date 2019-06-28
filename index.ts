@@ -48,17 +48,17 @@ async function run() {
 function printSummary() {
     let success = true
     for (let file of results.keys()) {
-        if (exitCodes.get(file) !== 0) {
+        const exitCode = exitCodes.get(file)
+        const r = results.get(file)
+
+        if (exitCode === 0 && r.ok) {
+            console.log(`OK   ${file} ${r.pass}/${r.count}`)
+        } else if (!r.ok) {
             success = false
-            console.log(file + ' exited with error ' + exitCodes.get(file))
+            console.log(`FAIL ${file} ${r.pass}/${r.count}`)
         } else {
-            let r = results.get(file)
-            if (!r.ok) {
-                success = false
-            }
-            console.log(
-                file + (r.ok ? ' ok ' : ' fail ') + r.pass + '/' + r.count
-            )
+            success = false
+            console.log(`FAIL ${file} exited with error ${exitCode}`)
         }
     }
 
