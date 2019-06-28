@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.3.0] 2019-06-28
+
+Rewritten in typescript using async/await
+
+### New features
+
+-   Show which tests were running if multi-tape is
+    terminated with a signal
+
+### Fixes
+
+-   Updated outdated dependencies
+
 ## [1.2.1] 2018-09-05
 
 ### Fixes
