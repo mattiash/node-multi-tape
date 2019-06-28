@@ -1,0 +1,11 @@
+*.tap
+coverage/
+.nyc_output
+*.ts
+!*.d.ts
+test/
+build/test/
+.prettierrc
+.travis.yml
+tsconfig.json
+tslint.json
