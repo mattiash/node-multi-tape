@@ -18,8 +18,10 @@ export async function runTest(
     outputToFile: boolean
 ): Promise<Result> {
     let proc = spawn('node', nodeArgs.concat(filename))
-    let exited = new Promise<number>(resolve => {
-        proc.on('exit', (exitCode: number) => resolve(exitCode))
+    let exited = new Promise<{ exitCode: number; signal: string }>(resolve => {
+        proc.on('exit', (exitCode: number, signal: string) => {
+            resolve({ exitCode, signal })
+        })
     })
 
     const output = logConsole
@@ -40,7 +42,7 @@ export async function runTest(
         proc.stderr.pipe(output)
     })
 
-    const exitCode = await exited
+    const { exitCode, signal } = await exited
     const result = await parsed
 
     if (!logConsole) {
@@ -48,6 +50,8 @@ export async function runTest(
             (output as streams.WritableStreamBuffer).getContentsAsString('utf8')
         )
     }
+
+    if (signal) console.log(`${filename} exited with signal ${signal}`)
 
     return {
         exitCode,

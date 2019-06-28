@@ -29,12 +29,22 @@ if (argv['node-arg']) {
 }
 
 const files = globArgs(argv._).sort()
+const inProgress = new Set<string>()
+
+let aborted = new Set<string>()
+
+function printInProgress() {
+    inProgress.forEach(file => {
+        aborted.add(file)
+    })
+}
 
 async function thread() {
     let file: string | undefined
     while ((file = files.shift())) {
-        console.log('file', file)
+        inProgress.add(file)
         const result = await runTest(file, nodeArgs, argv.p === 1, argv.o)
+        inProgress.delete(file)
         results.set(file, result.result)
         exitCodes.set(file, result.exitCode)
     }
@@ -47,6 +57,7 @@ async function run() {
 
 function printSummary() {
     let success = true
+    console.log('')
     for (let file of results.keys()) {
         const exitCode = exitCodes.get(file)
         const r = results.get(file)
@@ -62,9 +73,18 @@ function printSummary() {
         }
     }
 
+    if (aborted.size > 0) {
+        console.log('\nmulti-tape aborted. Tests in progress: ')
+        aborted.forEach(file => console.log(`  ${file}`))
+        success = false
+    }
+
     if (!success) {
         process.exit(1)
     }
 }
+
+process.on('SIGTERM', printInProgress)
+process.on('SIGINT', printInProgress)
 
 run()
