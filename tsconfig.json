@@ -15,5 +15,5 @@
         "removeComments": true,
         "outDir": "build/"
     },
-    "include": ["index.ts", "test/*.ts"]
+    "include": ["index.ts", "lib/*.ts", "test/*.ts"]
 }

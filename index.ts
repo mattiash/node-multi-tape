@@ -1,101 +1,48 @@
 #! /usr/bin/env node
 
-'use strict'
+import { globArgs } from './lib/glob'
+import { runTest } from './lib/run-test'
 
-const argv = require('minimist')(process.argv.slice(2), {
+const argv: {
+    o: boolean
+    p: number
+    'node-arg': string | string[]
+    _: string[]
+} = require('minimist')(process.argv.slice(2), {
     boolean: ['o'],
     default: {
         p: 1,
     },
 })
 
-const Parser = require('tap-parser')
-const tee = require('tee')
-import * as streams from 'stream-buffers'
-import { spawn } from 'child_process'
-import { createWriteStream } from 'fs'
-const async = require('async-p')
-import * as glob from 'glob'
+const results = new Map<string, any>()
+const exitCodes = new Map<string, number>()
 
-let results = new Map<string, any>()
-let exitCodes = new Map<string, number>()
+const nodeArgs = new Array<string>()
 
-let nodeArgs: any = []
 if (argv['node-arg']) {
     if (Array.isArray(argv['node-arg'])) {
-        nodeArgs = argv['node-arg']
+        nodeArgs.push(...argv['node-arg'])
     } else {
         nodeArgs.push(argv['node-arg'])
     }
 }
 
-// Use glob to parse any test file args for patterns.
-export function globArgs(argv_: any) {
-    let globbedFiles = new Array<string>()
-    for (var i = 0; i < argv_.length; i++) {
-        let globResult = glob.sync(argv_[i])
+const files = globArgs(argv._).sort()
 
-        if (globResult.length < 1) {
-            // Glob found nothing. Just add this argument as-is.
-            globbedFiles.push(argv_[i])
-        } else {
-            globbedFiles = globbedFiles.concat(globResult)
-        }
+async function thread() {
+    let file: string | undefined
+    while ((file = files.shift())) {
+        console.log('file', file)
+        const result = await runTest(file, nodeArgs, argv.p === 1, argv.o)
+        results.set(file, result.result)
+        exitCodes.set(file, result.exitCode)
     }
-    return globbedFiles
 }
-module.exports.globArgs = globArgs
 
-let files = globArgs(argv._).sort()
-
-// Start argv.p tests in parallel
-async
-    .eachLimit(files, runTest, argv.p)
-    .then(printSummary)
-    .catch(console.dir) // eslint-disable-line no-console
-
-// Returns a promise that resolves whe the test has been run
-function runTest(filename: string) {
-    let proc = spawn('node', nodeArgs.concat(filename))
-    let exited = new Promise(function(resolve) {
-        proc.on('exit', (exitCode: number) => resolve(exitCode))
-    })
-
-    let output: NodeJS.WriteStream | streams.WritableStreamBuffer
-
-    let parsed = new Promise(function(resolve) {
-        let p = new Parser(resolve)
-        if (argv.p === 1) {
-            output = process.stdout
-        } else {
-            output = new streams.WritableStreamBuffer()
-        }
-
-        output.write('\n#\n# ' + filename + '\n#\n')
-
-        if (argv.o) {
-            proc.stdout
-                .pipe(tee(p, createWriteStream(filename + '.tap')))
-                .pipe(output)
-        } else {
-            proc.stdout.pipe(tee(p)).pipe(output)
-        }
-        proc.stderr.pipe(output)
-    })
-
-    return Promise.all([exited, parsed])
-        .then(function(values) {
-            exitCodes.set(filename, values[0] as number)
-            results.set(filename, values[1])
-            if (argv.p > 1) {
-                console.log(
-                    (output as streams.WritableStreamBuffer).getContentsAsString(
-                        'utf8'
-                    )
-                )
-            }
-        })
-        .catch(console.dir)
+async function run() {
+    await Promise.all(new Array(argv.p).fill(0).map(() => thread()))
+    printSummary()
 }
 
 function printSummary() {
@@ -119,3 +66,5 @@ function printSummary() {
         process.exit(1)
     }
 }
+
+run()
