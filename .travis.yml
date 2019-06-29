@@ -3,5 +3,5 @@ node_js:
     - 'node'
     - '10'
     - '8'
-script: 'npm run test-travis'
+script: 'npm run lint && npm run test-travis'
 after_script: 'cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js'
