@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.3.1] 2019-12-13
+
+### Fixes
+
+-   Split up output in smaller chunks to avoid overflowing stdout
+    buffers which will terminate node with
+    `write /dev/stdout: resource temporarily unavailable`
+    Fix by @zommarin.
+
 ## [1.3.0] 2019-06-28
 
 Rewritten in typescript using async/await
