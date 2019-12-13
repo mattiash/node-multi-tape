@@ -46,9 +46,14 @@ export async function runTest(
     const result = await parsed
 
     if (!logConsole) {
-        console.log(
-            (output as streams.WritableStreamBuffer).getContentsAsString('utf8')
+        const lines = (output as streams.WritableStreamBuffer).getContentsAsString(
+            'utf8'
         )
+        if (lines) {
+            for (const line of lines.split('\n')) {
+                console.log(line)
+            }
+        }
     }
 
     if (signal) {
