@@ -8,7 +8,7 @@
     "scripts": {
         "prepare": "tsc && chmod +x build/index.js",
         "test": "./build/index.js -p 2 -o build/test/test-*.js",
-        "test-travis": "tsc && nyc --include build/lib/* --reporter lcov ./build/index.js -o -p 4 build/test/test-*.js",
+        "test-travis": "tsc && nyc --exclude-after-remap false --exclude build/test/ --reporter=lcov ./build/index.js -p 2 -o build/test/test-*.js",
         "lint": "prettier -l *.ts lib/*.ts test/*.ts && tslint -t stylish -p tsconfig.json",
         "prepublishOnly": "npm run lint && npm run test"
     },
@@ -36,7 +36,7 @@
         "nyc": "^14.1.1",
         "prettier": "^1.18.2",
         "purple-tape": "^2.0.1",
-        "source-map-support": "^0.5.12",
+        "source-map-support": "^0.5.16",
         "tape": "^4.10.2",
         "tslint": "^5.18.0",
         "typescript": "^3.5.2"

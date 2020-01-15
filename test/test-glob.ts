@@ -1,3 +1,4 @@
+import 'source-map-support/register'
 import * as test from 'purple-tape'
 import { globArgs } from '../lib/glob'
 
