@@ -6,10 +6,11 @@ import { runTest } from './lib/run-test'
 const argv: {
     o: boolean
     p: number
+    j: boolean
     'node-arg': string | string[]
     _: string[]
 } = require('minimist')(process.argv.slice(2), {
-    boolean: ['o'],
+    boolean: ['o', 'j'],
     default: {
         p: 1,
     },
@@ -44,7 +45,13 @@ async function thread() {
     // tslint:disable-next-line:no-conditional-assignment
     while ((file = files.shift())) {
         inProgress.add(file)
-        const result = await runTest(file, nodeArgs, argv.p === 1, argv.o)
+        const result = await runTest(
+            file,
+            nodeArgs,
+            argv.p === 1,
+            argv.o,
+            argv.j
+        )
         inProgress.delete(file)
         results.set(file, result.result)
         exitCodes.set(file, result.exitCode)

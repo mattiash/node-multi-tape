@@ -3,6 +3,7 @@ const tee = require('tee')
 import * as streams from 'stream-buffers'
 import { spawn } from 'child_process'
 import { createWriteStream } from 'fs'
+import { basename } from 'path'
 
 interface Result {
     exitCode: number
@@ -15,9 +16,21 @@ export async function runTest(
     filename: string,
     nodeArgs: string[],
     logConsole: boolean,
-    outputToFile: boolean
+    outputToFile: boolean,
+    junitOutput: boolean
 ): Promise<Result> {
-    let proc = spawn('node', nodeArgs.concat(filename))
+    const extraEnv = {} as any
+    if (junitOutput) {
+        extraEnv.PT_XUNIT_FILE = filename + '.xml'
+        extraEnv.PT_XUNIT_NAME = basename(filename)
+    }
+
+    let proc = spawn('node', nodeArgs.concat(filename), {
+        env: {
+            ...process.env,
+            ...extraEnv,
+        },
+    })
     let exited = new Promise<{ exitCode: number; signal: string }>(resolve => {
         proc.on('exit', (exitCode: number, signal: string) => {
             resolve({ exitCode, signal })

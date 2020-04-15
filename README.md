@@ -40,6 +40,10 @@ with output sent to stdout and print a summary at the end
     until the test is finished. Without this, the output from different tests would
     be mixed.
 
+-   -j Pass in environment variables to purple-tape to make it produce
+    a junit xml-file. The output filename will be the name
+    of the test-file with '.xml' appended.
+
 ## Exit code
 
 multi-tape exits with code 1 if any test failed as shown by the tap-results or

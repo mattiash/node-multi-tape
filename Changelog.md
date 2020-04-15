@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+-   Add -j option to generate junit xml with purple-tape
+
 ## [1.3.1] 2019-12-13
 
 ### Fixes
