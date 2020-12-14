@@ -4,6 +4,7 @@ import * as streams from 'stream-buffers'
 import { spawn } from 'child_process'
 import { createWriteStream } from 'fs'
 import { basename } from 'path'
+import { Writable } from 'stream'
 
 interface Result {
     exitCode: number
@@ -37,9 +38,10 @@ export async function runTest(
         })
     })
 
-    const output = logConsole
+    const output: Writable = logConsole
         ? process.stdout
         : new streams.WritableStreamBuffer()
+
     output.write(`\n#\n# ${filename}\n#\n`)
 
     let parsed = new Promise<any>(resolve => {

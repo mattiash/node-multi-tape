@@ -20,23 +20,20 @@
     },
     "license": "MIT",
     "dependencies": {
-        "glob": "^7.1.4",
-        "minimist": "^1.2.0",
+        "glob": "^7.1.6",
+        "minimist": "^1.2.5",
         "stream-buffers": "^3.0.2",
-        "tap-parser": "^9.3.2",
+        "tap-parser": "^10.1.0",
         "tee": "^0.2.0"
     },
     "devDependencies": {
-        "@types/glob": "^7.1.1",
-        "@types/node": "^9.4.5",
+        "@types/glob": "^7.1.3",
+        "@types/node": "^12.12.6",
         "@types/stream-buffers": "^3.0.3",
-        "coveralls": "^3.0.4",
-        "nyc": "^14.1.1",
         "prettier": "^1.18.2",
-        "purple-tape": "^2.0.1",
-        "source-map-support": "^0.5.16",
-        "tape": "^4.10.2",
-        "tslint": "^5.18.0",
-        "typescript": "^3.5.2"
+        "purple-tape": "^3.9.1",
+        "source-map-support": "^0.5.19",
+        "tslint": "^6.1.3",
+        "typescript": "^4.1.3"
     }
 }

@@ -1,5 +1,5 @@
 import 'source-map-support/register'
-import * as test from 'purple-tape'
+import { test } from 'purple-tape'
 import { globArgs } from '../lib/glob'
 
 test("Glob parses this project's test/*.ts", async t => {
