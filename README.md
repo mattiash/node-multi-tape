@@ -1,8 +1,10 @@
 # multi-tape
 
-[![Build Status](https://travis-ci.org/mattiash/node-multi-tape.svg?branch=master)](https://travis-ci.org/mattiash/node-multi-tape)
+![Build master](https://github.com/mattiash/node-multi-tape/workflows/Build%20master/badge.svg)
+![Publish to nom](https://github.com/mattiash/node-multi-tape/workflows/Publish%20to%20npm/badge.svg)
+![npm version](https://badge.fury.io/js/multi-tape.svg)
 
-A tool for running [tape](https://github.com/substack/tape) tests in multiple files
+A tool for running [tape](https://github.com/substack/tape) tests in multiple files. Goes well together with [purple-tape](https://www.npmjs.com/package/purple-tape)
 
 ## Background
 

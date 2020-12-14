@@ -6,11 +6,9 @@
         "multi-tape": "build/index.js"
     },
     "scripts": {
-        "prepare": "tsc && chmod +x build/index.js",
+        "build": "tsc",
         "test": "./build/index.js -p 2 -o build/test/test-*.js",
-        "test-travis": "tsc && nyc --exclude-after-remap false --exclude build/test/ --reporter=lcov ./build/index.js -p 2 -o build/test/test-*.js",
-        "lint": "prettier -l *.ts lib/*.ts test/*.ts && tslint -t stylish -p tsconfig.json",
-        "prepublishOnly": "npm run lint && npm run test"
+        "lint": "prettier -l *.ts lib/*.ts test/*.ts && tslint -t stylish -p tsconfig.json"
     },
     "author": "Mattias Holmlund <mattias@holmlund.se>",
     "bugs": {

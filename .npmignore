@@ -9,3 +9,4 @@ build/test/
 .travis.yml
 tsconfig.json
 tslint.json
+.github/
