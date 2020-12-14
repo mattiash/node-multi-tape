@@ -6,7 +6,7 @@
         "multi-tape": "build/index.js"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsc && chmod +x build/index.js",
         "test": "./build/index.js -p 2 -o build/test/test-*.js",
         "lint": "prettier -l *.ts lib/*.ts test/*.ts && tslint -t stylish -p tsconfig.json"
     },
