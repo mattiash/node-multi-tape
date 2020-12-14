@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import { globArgs } from './lib/glob'
-import { runTest } from './lib/run-test'
+import { Result, runTest } from './lib/run-test'
 
 const argv: {
     o: boolean
@@ -16,8 +16,7 @@ const argv: {
     },
 })
 
-const results = new Map<string, any>()
-const exitCodes = new Map<string, number>()
+const results = new Map<string, Result>()
 
 const nodeArgs = new Array<string>()
 
@@ -53,8 +52,7 @@ async function thread() {
             argv.j
         )
         inProgress.delete(file)
-        results.set(file, result.result)
-        exitCodes.set(file, result.exitCode)
+        results.set(file, result)
     }
 }
 
@@ -66,15 +64,17 @@ async function run() {
 function printSummary() {
     let success = true
     console.log('')
-    for (let file of results.keys()) {
-        const exitCode = exitCodes.get(file)
-        const r = results.get(file)
+    for (let [file, res] of [...results.entries()].sort(
+        (a, b) => a[1].executionTime - b[1].executionTime
+    )) {
+        const { exitCode, result: r, executionTime } = res
 
+        const timeStr = `${(executionTime / 1000).toFixed(1)}s`
         if (exitCode === 0 && r.ok) {
-            console.log(`OK   ${file} ${r.pass}/${r.count}`)
+            console.log(`OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
         } else if (!r.ok) {
             success = false
-            console.log(`FAIL ${file} ${r.pass}/${r.count}`)
+            console.log(`FAIL ${file} (${timeStr}) ${r.pass}/${r.count}`)
         } else {
             success = false
             console.log(`FAIL ${file} exited with error ${exitCode}`)

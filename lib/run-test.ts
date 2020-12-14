@@ -6,8 +6,9 @@ import { createWriteStream } from 'fs'
 import { basename } from 'path'
 import { Writable } from 'stream'
 
-interface Result {
+export interface Result {
     exitCode: number
+    executionTime: number
     result: any
 }
 
@@ -26,6 +27,7 @@ export async function runTest(
         extraEnv.PT_XUNIT_NAME = basename(filename)
     }
 
+    const startTime = Date.now()
     let proc = spawn('node', nodeArgs.concat(filename), {
         env: {
             ...process.env,
@@ -58,6 +60,7 @@ export async function runTest(
     })
 
     const { exitCode, signal } = await exited
+    const endTime = Date.now()
     const result = await parsed
 
     if (!logConsole) {
@@ -76,6 +79,7 @@ export async function runTest(
     }
     return {
         exitCode,
+        executionTime: endTime - startTime,
         result,
     }
 }
