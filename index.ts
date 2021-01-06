@@ -7,12 +7,14 @@ const argv: {
     o: boolean
     p: number
     j: boolean
+    t: number
     'node-arg': string | string[]
     _: string[]
 } = require('minimist')(process.argv.slice(2), {
     boolean: ['o', 'j'],
     default: {
         p: 1,
+        t: 0,
     },
 })
 
@@ -49,7 +51,8 @@ async function thread() {
             nodeArgs,
             argv.p === 1,
             argv.o,
-            argv.j
+            argv.j,
+            argv.t
         )
         inProgress.delete(file)
         results.set(file, result)
@@ -74,7 +77,9 @@ function printSummary() {
             console.log(`OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
         } else if (!r.ok) {
             success = false
-            console.log(`FAIL ${file} (${timeStr}) ${r.pass}/${r.count}`)
+            console.log(
+                `FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
+            )
         } else {
             success = false
             console.log(`FAIL ${file} exited with error ${exitCode}`)

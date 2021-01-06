@@ -3,12 +3,16 @@ import { test } from 'purple-tape'
 import { globArgs } from '../lib/glob'
 
 test("Glob parses this project's test/*.ts", async t => {
-    let arg = ['test/*.ts']
+    let arg = ['test/test*.ts']
     let result = globArgs(arg)
 
     t.deepEqual(
         result.sort(),
-        ['test/test-aaa-large-output.ts', 'test/test-glob.ts'],
+        [
+            'test/test-aaa-large-output.ts',
+            'test/test-glob.ts',
+            'test/test-never-exit.ts',
+        ],
         'shall return an array of filenames'
     )
 })
@@ -22,7 +26,7 @@ test('Glob still parses an actual file', t => {
 test('A combination of different inputs', t => {
     let arg = [
         'test/test-glob.ts',
-        'test/*.ts',
+        'test/test-*.ts',
         'wibble/wibble123.example',
         'wibble/*.wibblet',
     ]
@@ -32,11 +36,12 @@ test('A combination of different inputs', t => {
 
     let result = globArgs(arg)
 
-    t.deepEqual(result, [
-        'test/test-glob.ts',
+    t.deepEqual(result.sort(), [
         'test/test-aaa-large-output.ts',
         'test/test-glob.ts',
-        'wibble/wibble123.example',
+        'test/test-glob.ts',
+        'test/test-never-exit.ts',
         'wibble/*.wibblet',
+        'wibble/wibble123.example',
     ])
 })

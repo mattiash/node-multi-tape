@@ -19,7 +19,8 @@ export async function runTest(
     nodeArgs: string[],
     logConsole: boolean,
     outputToFile: boolean,
-    junitOutput: boolean
+    junitOutput: boolean,
+    timeout: number
 ): Promise<Result> {
     const extraEnv = {} as any
     if (junitOutput) {
@@ -28,17 +29,33 @@ export async function runTest(
     }
 
     const startTime = Date.now()
+
     let proc = spawn('node', nodeArgs.concat(filename), {
         env: {
             ...process.env,
             ...extraEnv,
         },
     })
-    let exited = new Promise<{ exitCode: number; signal: string }>(resolve => {
-        proc.on('exit', (exitCode: number, signal: string) => {
-            resolve({ exitCode, signal })
-        })
-    })
+
+    let aborted = false
+    const exited = new Promise<{ exitCode: number; signal: string }>(
+        resolve => {
+            const timer =
+                timeout > 0
+                    ? setTimeout(() => {
+                          proc.kill('SIGTERM')
+                          aborted = true
+                      }, timeout)
+                    : undefined
+
+            proc.on('exit', (exitCode: number, signal: string) => {
+                if (timer) {
+                    clearTimeout(timer)
+                }
+                resolve({ exitCode, signal })
+            })
+        }
+    )
 
     const output: Writable = logConsole
         ? process.stdout
@@ -59,10 +76,13 @@ export async function runTest(
         proc.stderr.pipe(output)
     })
 
-    const { exitCode, signal } = await exited
+    let { exitCode, signal } = await exited
     const endTime = Date.now()
-    const result = await parsed
-
+    let result = await parsed
+    if (aborted) {
+        result += `\n\n# Test aborted after ${timeout}ms`
+        exitCode = exitCode || 1
+    }
     if (!logConsole) {
         const lines = (output as streams.WritableStreamBuffer).getContentsAsString(
             'utf8'
