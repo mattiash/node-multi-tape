@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.6.1] 2021-01-29
+
 -   Add MT_DEBUG_INTERVAL setting
 -   Send SIGKILL if SIGTERM does not cause test to exit
 
