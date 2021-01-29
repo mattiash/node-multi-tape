@@ -40,11 +40,24 @@ export async function runTest(
     let aborted = false
     const exited = new Promise<{ exitCode: number; signal: string }>(
         resolve => {
-            const timer =
+            let timer =
                 timeout > 0
                     ? setTimeout(() => {
+                          console.log(
+                              `## multi-tape: Timeout for ${basename(
+                                  filename
+                              )}. Sending SIGTERM`
+                          )
                           proc.kill('SIGTERM')
                           aborted = true
+                          timer = setTimeout(() => {
+                              console.log(
+                                  `## multi-tape: Second timeout for ${basename(
+                                      filename
+                                  )}. Sending SIGKILL`
+                              )
+                              proc.kill('SIGKILL')
+                          }, 10_000)
                       }, timeout)
                     : undefined
 
