@@ -100,4 +100,11 @@ function printSummary() {
 process.on('SIGTERM', printInProgress)
 process.on('SIGINT', printInProgress)
 
+if (process.env.MT_DEBUG_INTERVAL) {
+    setInterval(() => {
+        console.log(`## Queued: ${files.length}`)
+        console.log(`## Running: ${[...inProgress.keys()]}`)
+    }, parseInt(process.env.MT_DEBUG_INTERVAL)).unref()
+}
+
 void run()
