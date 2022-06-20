@@ -48,6 +48,8 @@ with output sent to stdout and print a summary at the end
 
 -   -t 10000 Timeout in ms for how long each test-file is allowed to run. Default is no timeout.
 
+- --controller="command with parameters" Run a command before starting the tests. Wait for the command to print something on stdout before starting the tests. Kill the command when all tests are done.
+
 ## Exit code
 
 multi-tape exits with code 1 if any test failed as shown by the tap-results or

@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 
+import { spawn } from 'child_process'
 import { globArgs } from './lib/glob'
 import { Result, runTest } from './lib/run-test'
 
@@ -9,6 +10,7 @@ const argv: {
     j: boolean
     t: number
     'node-arg': string | string[]
+    controller: string
     _: string[]
 } = require('minimist')(process.argv.slice(2), {
     boolean: ['o', 'j'],
@@ -60,8 +62,44 @@ async function thread() {
 }
 
 async function run() {
+    let controller: ReturnType<typeof spawn> | undefined
+    let controllerRunning = false
+    if (argv.controller) {
+        await new Promise<void>((resolve, reject) => {
+            controller = spawn(argv.controller, [], {
+                shell: true,
+                stdio: ['ignore', 'pipe', 'pipe'],
+            })
+
+            controller.stdout?.on('data', data => {
+                console.log(`controller: ${data}`)
+                controllerRunning = true
+                resolve()
+            })
+
+            controller.stderr?.on('data', data => {
+                console.error(`controller: ${data}`)
+            })
+
+            controller.on('error', code => {
+                reject()
+                console.log(`controller error ${code}`)
+            })
+
+            controller.on('close', () => {
+                controllerRunning = false
+            })
+        })
+    }
+
     await Promise.all(new Array(argv.p).fill(0).map(() => thread()))
-    printSummary()
+    if (controller && controllerRunning) {
+        console.log('controller: stopping')
+        controller.once('close', () => printSummary())
+        controller.kill()
+    } else {
+        printSummary()
+    }
 }
 
 function printSummary() {
