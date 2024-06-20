@@ -1,4 +1,4 @@
-const Parser = require('tap-parser')
+import { Parser } from 'tap-parser'
 const tee = require('tee')
 import * as streams from 'stream-buffers'
 import { spawn } from 'child_process'
