@@ -1,6 +1,6 @@
 {
     "name": "@ig3/multi-tape",
-    "version": "1.7.1",
+    "version": "1.7.2",
     "description": "Runner for tape-tests",
     "bin": {
         "multi-tape": "build/index.js"
@@ -12,11 +12,11 @@
     },
     "author": "Mattias Holmlund <mattias@holmlund.se>",
     "bugs": {
-        "url": "https://github.com/mattiash/node-multi-tape/issues"
+        "url": "https://github.com/ig3/node-multi-tape/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/mattiash/node-multi-tape.git"
+        "url": "https://github.com/ig3/node-multi-tape.git"
     },
     "license": "MIT",
     "dependencies": {
