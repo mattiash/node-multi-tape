@@ -1,4 +1,5 @@
-import { Parser } from 'tap-parser'
+import { FinalResults, Parser } from 'tap-parser'
+// eslint-disable-next-line
 const tee = require('tee')
 import * as streams from 'stream-buffers'
 import { spawn } from 'child_process'
@@ -9,7 +10,7 @@ import { Writable } from 'stream'
 export interface Result {
     exitCode: number
     executionTime: number
-    result: any
+    result: FinalResults
 }
 
 // Returns a promise that resolves whe the test has been run
@@ -22,7 +23,7 @@ export async function runTest(
     junitOutput: boolean,
     timeout: number
 ): Promise<Result> {
-    const extraEnv = {} as any
+    const extraEnv = {} as Record<string,string>
     if (junitOutput) {
         extraEnv.PT_XUNIT_FILE = filename + '.xml'
         extraEnv.PT_XUNIT_NAME = basename(filename)
@@ -30,7 +31,7 @@ export async function runTest(
 
     const startTime = Date.now()
 
-    let proc = spawn('node', nodeArgs.concat(filename), {
+    const proc = spawn('node', nodeArgs.concat(filename), {
         env: {
             ...process.env,
             ...extraEnv,
@@ -76,8 +77,8 @@ export async function runTest(
 
     output.write(`\n#\n# ${filename}\n#\n`)
 
-    let parsed = new Promise<any>(resolve => {
-        let p = new Parser(resolve)
+    const parsed = new Promise<FinalResults>(resolve => {
+        const p = new Parser(resolve)
 
         if (outputToFile) {
             proc.stdout
@@ -89,11 +90,13 @@ export async function runTest(
         proc.stderr.pipe(output)
     })
 
-    let { exitCode, signal } = await exited
+    const exitedResult = await exited
+    let { exitCode } = exitedResult
+    const { signal } = exitedResult
     const endTime = Date.now()
-    let result = await parsed
+    const result = await parsed
     if (aborted) {
-        result += `\n\n# Test aborted after ${timeout}ms`
+//        result += `\n\n# Test aborted after ${timeout}ms`
         exitCode = exitCode || 1
     }
     if (!logConsole) {

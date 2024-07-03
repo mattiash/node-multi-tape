@@ -8,7 +8,7 @@
     "scripts": {
         "build": "tsc && chmod +x build/index.js",
         "test": "./build/index.js -p 2 -o build/test/test-*.js",
-        "lint": "prettier -l *.ts lib/*.ts test/*.ts && tslint -t stylish -p tsconfig.json"
+        "lint": "prettier --check *.ts lib/*.ts test/*.ts && eslint ."
     },
     "author": "Mattias Holmlund <mattias@holmlund.se>",
     "bugs": {
@@ -27,12 +27,16 @@
         "tee": "^0.2.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.6.0",
+        "@types/eslint__js": "^8.42.3",
+        "@types/minimist": "^1.2.5",
         "@types/node": "^16.11.7",
         "@types/stream-buffers": "^3.0.3",
+        "eslint": "^8.57.0",
         "prettier": "^3.3.2",
         "purple-tape": "^3.9.1",
         "source-map-support": "^0.5.21",
-        "tslint": "^6.1.3",
-        "typescript": "^5.5.3"
+        "typescript": "^5.5.3",
+        "typescript-eslint": "^7.15.0"
     }
 }

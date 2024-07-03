@@ -3,16 +3,14 @@
 import { spawn } from 'child_process'
 import { globArgs } from './lib/glob'
 import { Result, runTest } from './lib/run-test'
+import parseArgs = require('minimist')
 
-const argv: {
+const argv = parseArgs<{
     o: boolean
     p: number
     j: boolean
     t: number
-    'node-arg': string | string[]
-    controller: string
-    _: string[]
-} = require('minimist')(process.argv.slice(2), {
+}>(process.argv.slice(2), {
     boolean: ['o', 'j'],
     default: {
         p: 1,
@@ -35,7 +33,7 @@ if (argv['node-arg']) {
 const files = globArgs(argv._).sort()
 const inProgress = new Set<string>()
 
-let aborted = new Set<string>()
+const aborted = new Set<string>()
 
 function printInProgress() {
     inProgress.forEach(file => {
@@ -105,7 +103,7 @@ async function run() {
 function printSummary() {
     let success = true
     console.log('')
-    for (let [file, res] of [...results.entries()].sort(
+    for (const [file, res] of [...results.entries()].sort(
         (a, b) => a[1].executionTime - b[1].executionTime
     )) {
         const { exitCode, result: r, executionTime } = res
