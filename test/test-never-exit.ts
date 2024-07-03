@@ -8,7 +8,7 @@ async function run() {
         console.log("Execution succeeded when it shouldn't have")
         process.exit(1)
     } catch (err) {
-        if (err.code === 1) {
+        if (err instanceof Object && 'code' in err && err.code === 1) {
             console.log(`Execution interrupted with timeout.\nok 1
 1..1
 # tests 1
