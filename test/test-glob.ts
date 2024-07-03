@@ -2,7 +2,7 @@ import 'source-map-support/register'
 import { test } from 'purple-tape'
 import { globArgs } from '../lib/glob'
 
-test("Glob parses this project's test/*.ts", async t => {
+test("Glob parses this project's test/*.ts", async (t) => {
     const arg = ['test/test*.ts']
     const result = globArgs(arg)
 
@@ -17,13 +17,13 @@ test("Glob parses this project's test/*.ts", async t => {
     )
 })
 
-test('Glob still parses an actual file', t => {
+test('Glob still parses an actual file', (t) => {
     const arg = ['test/test-glob.ts']
     const result = globArgs(arg)
     t.deepEqual(result, arg, 'shall return the name of a file that exists')
 })
 
-test('A combination of different inputs', t => {
+test('A combination of different inputs', (t) => {
     const arg = [
         'test/test-glob.ts',
         'test/test-*.ts',

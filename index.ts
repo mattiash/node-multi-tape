@@ -36,7 +36,7 @@ const inProgress = new Set<string>()
 const aborted = new Set<string>()
 
 function printInProgress() {
-    inProgress.forEach(file => {
+    inProgress.forEach((file) => {
         aborted.add(file)
     })
 }
@@ -69,17 +69,17 @@ async function run() {
                 stdio: ['ignore', 'pipe', 'pipe'],
             })
 
-            controller.stdout?.on('data', data => {
+            controller.stdout?.on('data', (data) => {
                 console.log(`controller: ${data}`)
                 controllerRunning = true
                 resolve()
             })
 
-            controller.stderr?.on('data', data => {
+            controller.stderr?.on('data', (data) => {
                 console.error(`controller: ${data}`)
             })
 
-            controller.on('error', code => {
+            controller.on('error', (code) => {
                 reject()
                 console.log(`controller error ${code}`)
             })
@@ -124,7 +124,7 @@ function printSummary() {
 
     if (aborted.size > 0) {
         console.log('\nmulti-tape aborted. Tests in progress: ')
-        aborted.forEach(file => console.log(`  ${file}`))
+        aborted.forEach((file) => console.log(`  ${file}`))
         success = false
     }
 

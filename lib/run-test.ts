@@ -23,7 +23,7 @@ export async function runTest(
     junitOutput: boolean,
     timeout: number
 ): Promise<Result> {
-    const extraEnv = {} as Record<string,string>
+    const extraEnv = {} as Record<string, string>
     if (junitOutput) {
         extraEnv.PT_XUNIT_FILE = filename + '.xml'
         extraEnv.PT_XUNIT_NAME = basename(filename)
@@ -40,7 +40,7 @@ export async function runTest(
 
     let aborted = false
     const exited = new Promise<{ exitCode: number; signal: string }>(
-        resolve => {
+        (resolve) => {
             let timer =
                 timeout > 0
                     ? setTimeout(() => {
@@ -77,7 +77,7 @@ export async function runTest(
 
     output.write(`\n#\n# ${filename}\n#\n`)
 
-    const parsed = new Promise<FinalResults>(resolve => {
+    const parsed = new Promise<FinalResults>((resolve) => {
         const p = new Parser(resolve)
 
         if (outputToFile) {
@@ -96,13 +96,12 @@ export async function runTest(
     const endTime = Date.now()
     const result = await parsed
     if (aborted) {
-//        result += `\n\n# Test aborted after ${timeout}ms`
         exitCode = exitCode || 1
     }
     if (!logConsole) {
-        const lines = (output as streams.WritableStreamBuffer).getContentsAsString(
-            'utf8'
-        )
+        const lines = (
+            output as streams.WritableStreamBuffer
+        ).getContentsAsString('utf8')
         if (lines) {
             for (const line of lines.split('\n')) {
                 console.log(line)
