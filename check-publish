@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+if [ -n "$(git status --porcelain)" ];
+then
+    git status
+    echo "Uncommitted changes. Exiting."
+    exit 1
+fi
+
+git clean -fdx
+npm ci
+npm run lint
+npm run build
+npm run test
+
+# List files that will be included by running npm pack
+npm pack --dry-run
