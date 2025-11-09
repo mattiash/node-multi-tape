@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+-   Update all dependencies to latest versions
+-   Upgrade to ESLint 9 and typescript-eslint 8
+-   Upgrade glob to v11 and tap-parser to v18
+-   Upgrade @types/node to v24
+
+### Fixes
+
+-   Modernize import syntax to use standard ES module imports
+-   Add esModuleInterop to TypeScript configuration for better module compatibility
+
 ## [1.7.1] 2024-07-03
 
 -   Update dependencies and github actions

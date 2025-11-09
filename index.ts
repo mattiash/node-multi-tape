@@ -3,20 +3,12 @@
 import { spawn } from 'child_process'
 import { globArgs } from './lib/glob'
 import { Result, runTest } from './lib/run-test'
-import parseArgs = require('minimist')
+import parseArgs from 'minimist'
 
-const argv = parseArgs<{
-    o: boolean
-    p: number
-    j: boolean
-    t: number
-}>(process.argv.slice(2), {
-    boolean: ['o', 'j'],
-    default: {
-        p: 1,
-        t: 0,
-    },
-})
+const argv = parseArgs<{ o: boolean; p: number; j: boolean; t: number }>(
+    process.argv.slice(2),
+    { boolean: ['o', 'j'], default: { p: 1, t: 0 } }
+)
 
 const results = new Map<string, Result>()
 

@@ -13,7 +13,8 @@
         "inlineSourceMap": true,
         "declaration": true,
         "removeComments": true,
-        "outDir": "build/"
+        "outDir": "build/",
+        "esModuleInterop": true
     },
     "include": ["index.ts", "lib/*.ts", "test/*.ts"]
 }
