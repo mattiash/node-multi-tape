@@ -1,7 +1,7 @@
 # multi-tape
 
 ![Build master](https://github.com/mattiash/node-multi-tape/workflows/Build%20master/badge.svg)
-![Publish to nom](https://github.com/mattiash/node-multi-tape/workflows/Publish%20to%20npm/badge.svg)
+![Publish to npm](https://github.com/mattiash/node-multi-tape/workflows/Publish%20Package/badge.svg)
 ![npm version](https://badge.fury.io/js/multi-tape.svg)
 
 A tool for running [tape](https://github.com/substack/tape) tests in multiple files. Goes well together with [purple-tape](https://www.npmjs.com/package/purple-tape)
@@ -48,7 +48,7 @@ with output sent to stdout and print a summary at the end
 
 -   -t 10000 Timeout in ms for how long each test-file is allowed to run. Default is no timeout.
 
-- --controller="command with parameters" Run a command before starting the tests. Wait for the command to print something on stdout before starting the tests. Kill the command when all tests are done.
+-   --controller="command with parameters" Run a command before starting the tests. Wait for the command to print something on stdout before starting the tests. Kill the command when all tests are done.
 
 ## Exit code
 
