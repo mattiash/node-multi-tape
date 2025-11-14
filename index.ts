@@ -29,7 +29,39 @@ if (argv['node-arg']) {
     }
 }
 
+function printHelp() {
+    console.log(`
+multi-tape - Run tape tests in multiple files
+
+Usage: multi-tape [options] <test-files...>
+
+Options:
+  -o                  Send output to one file per test-file (.tap extension)
+  --node-arg=<arg>    Pass an option to node (can be used multiple times)
+  -p=<N>              Run N tests in parallel (default: 1)
+  -j                  Generate JUnit XML output (.xml extension)
+  -t <ms>             Timeout in milliseconds for each test file
+  -q                  Quiet mode - only show test results as they complete
+  -e                  Errors-only mode - only show output from failing tests
+  --controller=<cmd>  Run a command before tests, kill it when done
+
+Examples:
+  multi-tape test/*.js
+  multi-tape -p 4 test/*.js
+  multi-tape -e -p 2 test/*.js
+  multi-tape -o test/*.js
+
+For more information, visit: https://github.com/mattiash/node-multi-tape
+`)
+}
+
 const files = globArgs(argv._).sort()
+
+if (files.length === 0) {
+    printHelp()
+    process.exit(0)
+}
+
 const inProgress = new Set<string>()
 
 const aborted = new Set<string>()
