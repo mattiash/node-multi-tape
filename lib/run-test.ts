@@ -22,7 +22,8 @@ export async function runTest(
     outputToFile: boolean,
     junitOutput: boolean,
     timeout: number,
-    quiet: boolean = false
+    quiet: boolean = false,
+    errorsOnly: boolean = false
 ): Promise<Result> {
     const extraEnv = {} as Record<string, string>
     if (junitOutput) {
@@ -73,11 +74,13 @@ export async function runTest(
     )
 
     const output: Writable =
-        logConsole && !quiet
+        logConsole && !quiet && !errorsOnly
             ? process.stdout
             : new streams.WritableStreamBuffer()
 
-    if (!quiet) {
+    if (!quiet && !errorsOnly) {
+        output.write(`\n#\n# ${filename}\n#\n`)
+    } else if (errorsOnly) {
         output.write(`\n#\n# ${filename}\n#\n`)
     }
 
@@ -102,7 +105,11 @@ export async function runTest(
     if (aborted) {
         exitCode = exitCode || 1
     }
-    if (!logConsole && !quiet) {
+    const shouldPrintOutput =
+        (!logConsole && !quiet && !errorsOnly) ||
+        (errorsOnly && (exitCode !== 0 || !result.ok))
+
+    if (shouldPrintOutput) {
         const lines = (
             output as streams.WritableStreamBuffer
         ).getContentsAsString('utf8')
@@ -113,7 +120,9 @@ export async function runTest(
         }
     }
 
-    if (signal) {
+    if (signal && !quiet && !errorsOnly) {
+        console.log(`${filename} exited with signal ${signal}`)
+    } else if (signal && errorsOnly && (exitCode !== 0 || !result.ok)) {
         console.log(`${filename} exited with signal ${signal}`)
     }
     return {

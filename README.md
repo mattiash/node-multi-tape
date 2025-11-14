@@ -52,6 +52,9 @@ with output sent to stdout and print a summary at the end
   succeeded and which failed. Can be combined with -o to write output to files
   without printing to stdout.
 
+- -e Errors-only mode. Only prints output from failing tests, plus the summary at the end.
+  Useful for CI environments where you only want to see failures.
+
 - --controller="command with parameters" Run a command before starting the tests. Wait for the command to print something on stdout before starting the tests. Kill the command when all tests are done.
 
 ## Exit code

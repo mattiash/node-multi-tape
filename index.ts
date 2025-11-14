@@ -11,7 +11,11 @@ const argv = parseArgs<{
     j: boolean
     t: number
     q: boolean
-}>(process.argv.slice(2), { boolean: ['o', 'j', 'q'], default: { p: 1, t: 0 } })
+    e: boolean
+}>(process.argv.slice(2), {
+    boolean: ['o', 'j', 'q', 'e'],
+    default: { p: 1, t: 0 },
+})
 
 const results = new Map<string, Result>()
 
@@ -60,7 +64,8 @@ async function thread() {
             argv.o,
             argv.j,
             argv.t,
-            argv.q
+            argv.q,
+            argv.e
         )
         inProgress.delete(file)
         results.set(file, result)
@@ -81,7 +86,7 @@ async function run() {
             })
 
             controller.stdout?.on('data', (data) => {
-                if (!argv.q) {
+                if (!argv.q && !argv.e) {
                     console.log(`controller: ${data}`)
                 }
                 controllerRunning = true
@@ -89,7 +94,7 @@ async function run() {
             })
 
             controller.stderr?.on('data', (data) => {
-                if (!argv.q) {
+                if (!argv.q && !argv.e) {
                     console.error(`controller: ${data}`)
                 }
             })
@@ -107,7 +112,7 @@ async function run() {
 
     await Promise.all(new Array(argv.p).fill(0).map(() => thread()))
     if (controller && controllerRunning) {
-        if (!argv.q) {
+        if (!argv.q && !argv.e) {
             console.log('controller: stopping')
         }
         controller.once('close', () => printSummary())

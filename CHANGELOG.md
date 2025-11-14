@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Add -e option for errors-only mode that only prints output from failing tests plus the summary
+
 ## [1.8.0] 2025-11-14
 
 ### Features
