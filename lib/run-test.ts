@@ -21,7 +21,8 @@ export async function runTest(
     logConsole: boolean,
     outputToFile: boolean,
     junitOutput: boolean,
-    timeout: number
+    timeout: number,
+    quiet: boolean = false
 ): Promise<Result> {
     const extraEnv = {} as Record<string, string>
     if (junitOutput) {
@@ -71,11 +72,14 @@ export async function runTest(
         }
     )
 
-    const output: Writable = logConsole
-        ? process.stdout
-        : new streams.WritableStreamBuffer()
+    const output: Writable =
+        logConsole && !quiet
+            ? process.stdout
+            : new streams.WritableStreamBuffer()
 
-    output.write(`\n#\n# ${filename}\n#\n`)
+    if (!quiet) {
+        output.write(`\n#\n# ${filename}\n#\n`)
+    }
 
     const parsed = new Promise<FinalResults>((resolve) => {
         const p = new Parser(resolve)
@@ -98,7 +102,7 @@ export async function runTest(
     if (aborted) {
         exitCode = exitCode || 1
     }
-    if (!logConsole) {
+    if (!logConsole && !quiet) {
         const lines = (
             output as streams.WritableStreamBuffer
         ).getContentsAsString('utf8')

@@ -31,24 +31,28 @@ with output sent to stdout and print a summary at the end
 
 ## Options
 
--   -o send output to one file per test-file. The output filename will be the name
-    of the test-file with '.tap' appended. The result will still be printed to
-    STDOUT.
+- -o send output to one file per test-file. The output filename will be the name
+  of the test-file with '.tap' appended. The result will still be printed to
+  STDOUT.
 
--   --node-arg=--opt Send an option to node when invoking the test-file. Can be
-    used more than once.
+- --node-arg=--opt Send an option to node when invoking the test-file. Can be
+  used more than once.
 
--   -p=X Run X tests in parallel. If X > 1, the output from each test is buffered
-    until the test is finished. Without this, the output from different tests would
-    be mixed.
+- -p=X Run X tests in parallel. If X > 1, the output from each test is buffered
+  until the test is finished. Without this, the output from different tests would
+  be mixed.
 
--   -j Pass in environment variables to purple-tape to make it produce
-    a junit xml-file. The output filename will be the name
-    of the test-file with '.xml' appended.
+- -j Pass in environment variables to purple-tape to make it produce
+  a junit xml-file. The output filename will be the name
+  of the test-file with '.xml' appended.
 
--   -t 10000 Timeout in ms for how long each test-file is allowed to run. Default is no timeout.
+- -t 10000 Timeout in ms for how long each test-file is allowed to run. Default is no timeout.
 
--   --controller="command with parameters" Run a command before starting the tests. Wait for the command to print something on stdout before starting the tests. Kill the command when all tests are done.
+- -q Quiet mode. Suppresses all output except the final summary of which test-files
+  succeeded and which failed. Can be combined with -o to write output to files
+  without printing to stdout.
+
+- --controller="command with parameters" Run a command before starting the tests. Wait for the command to print something on stdout before starting the tests. Kill the command when all tests are done.
 
 ## Exit code
 

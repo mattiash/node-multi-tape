@@ -5,10 +5,13 @@ import { globArgs } from './lib/glob'
 import { Result, runTest } from './lib/run-test'
 import parseArgs from 'minimist'
 
-const argv = parseArgs<{ o: boolean; p: number; j: boolean; t: number }>(
-    process.argv.slice(2),
-    { boolean: ['o', 'j'], default: { p: 1, t: 0 } }
-)
+const argv = parseArgs<{
+    o: boolean
+    p: number
+    j: boolean
+    t: number
+    q: boolean
+}>(process.argv.slice(2), { boolean: ['o', 'j', 'q'], default: { p: 1, t: 0 } })
 
 const results = new Map<string, Result>()
 
@@ -33,6 +36,18 @@ function printInProgress() {
     })
 }
 
+function printTestResult(file: string, res: Result) {
+    const { exitCode, result: r, executionTime } = res
+    const timeStr = `${(executionTime / 1000).toFixed(1)}s`
+    if (exitCode === 0 && r.ok) {
+        console.log(`OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
+    } else if (!r.ok) {
+        console.log(`FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`)
+    } else {
+        console.log(`FAIL ${file} exited with error ${exitCode}`)
+    }
+}
+
 async function thread() {
     let file: string | undefined
     // tslint:disable-next-line:no-conditional-assignment
@@ -44,10 +59,14 @@ async function thread() {
             argv.p === 1,
             argv.o,
             argv.j,
-            argv.t
+            argv.t,
+            argv.q
         )
         inProgress.delete(file)
         results.set(file, result)
+        if (argv.q) {
+            printTestResult(file, result)
+        }
     }
 }
 
@@ -62,13 +81,17 @@ async function run() {
             })
 
             controller.stdout?.on('data', (data) => {
-                console.log(`controller: ${data}`)
+                if (!argv.q) {
+                    console.log(`controller: ${data}`)
+                }
                 controllerRunning = true
                 resolve()
             })
 
             controller.stderr?.on('data', (data) => {
-                console.error(`controller: ${data}`)
+                if (!argv.q) {
+                    console.error(`controller: ${data}`)
+                }
             })
 
             controller.on('error', (code) => {
@@ -84,7 +107,9 @@ async function run() {
 
     await Promise.all(new Array(argv.p).fill(0).map(() => thread()))
     if (controller && controllerRunning) {
-        console.log('controller: stopping')
+        if (!argv.q) {
+            console.log('controller: stopping')
+        }
         controller.once('close', () => printSummary())
         controller.kill()
     } else {
@@ -94,23 +119,22 @@ async function run() {
 
 function printSummary() {
     let success = true
-    console.log('')
-    for (const [file, res] of [...results.entries()].sort(
-        (a, b) => a[1].executionTime - b[1].executionTime
-    )) {
-        const { exitCode, result: r, executionTime } = res
-
-        const timeStr = `${(executionTime / 1000).toFixed(1)}s`
-        if (exitCode === 0 && r.ok) {
-            console.log(`OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
-        } else if (!r.ok) {
-            success = false
-            console.log(
-                `FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
-            )
-        } else {
-            success = false
-            console.log(`FAIL ${file} exited with error ${exitCode}`)
+    if (!argv.q) {
+        console.log('')
+        for (const [file, res] of [...results.entries()].sort(
+            (a, b) => a[1].executionTime - b[1].executionTime
+        )) {
+            printTestResult(file, res)
+            if (res.exitCode !== 0 || !res.result.ok) {
+                success = false
+            }
+        }
+    } else {
+        // In quiet mode, just check for failures
+        for (const [, res] of results.entries()) {
+            if (res.exitCode !== 0 || !res.result.ok) {
+                success = false
+            }
         }
     }
 
