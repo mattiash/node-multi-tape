@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.8.0] 2025-11-14
+
 ### Features
 
 - Add -q option for quiet mode that suppresses all output except test results, which are printed immediately as each test completes
