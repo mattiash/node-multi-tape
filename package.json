@@ -1,6 +1,6 @@
 {
     "name": "multi-tape",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "description": "Runner for tape-tests",
     "bin": {
         "multi-tape": "build/index.js"
