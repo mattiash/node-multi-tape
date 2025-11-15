@@ -7,6 +7,7 @@ import parseArgs from 'minimist'
 
 const argv = parseArgs<{
     o: boolean
+    O: string
     p: number
     j: boolean
     t: number
@@ -14,6 +15,7 @@ const argv = parseArgs<{
     e: boolean
 }>(process.argv.slice(2), {
     boolean: ['o', 'j', 'q', 'e'],
+    string: ['O'],
     default: { p: 1, t: 0 },
 })
 
@@ -37,6 +39,7 @@ Usage: multi-tape [options] <test-files...>
 
 Options:
   -o                  Send output to one file per test-file (.tap extension)
+  -O <dir>            Send output to directory (e.g., -O tapFiles/)
   --node-arg=<arg>    Pass an option to node (can be used multiple times)
   -p=<N>              Run N tests in parallel (default: 1)
   -j                  Generate JUnit XML output (.xml extension)
@@ -86,8 +89,9 @@ function printTestResult(file: string, res: Result) {
         } else {
             console.log(`FAIL ${file} exited with error ${exitCode}`)
         }
-        if (argv.o) {
-            console.log(`     See ${file}.tap`)
+        if (argv.o || argv.O) {
+            const tapFile = argv.O ? `${argv.O}${file}.tap` : `${file}.tap`
+            console.log(`     See ${tapFile}`)
         }
     }
 }
@@ -101,11 +105,12 @@ async function thread() {
             file,
             nodeArgs,
             argv.p === 1,
-            argv.o,
+            argv.o || !!argv.O,
             argv.j,
             argv.t,
             argv.q,
-            argv.e
+            argv.e,
+            argv.O
         )
         inProgress.delete(file)
         results.set(file, result)

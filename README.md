@@ -35,6 +35,9 @@ with output sent to stdout and print a summary at the end
   of the test-file with '.tap' appended. The result will still be printed to
   STDOUT.
 
+- -O <dir> send output to a specified directory. For example, `-O tapFiles/` will
+  write the output for `build/test/test-file.js` to `tapFiles/build/test/test-file.js.tap`.
+
 - --node-arg=--opt Send an option to node when invoking the test-file. Can be
   used more than once.
 

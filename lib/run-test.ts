@@ -4,7 +4,8 @@ const tee = require('tee')
 import * as streams from 'stream-buffers'
 import { spawn } from 'child_process'
 import { createWriteStream } from 'fs'
-import { basename } from 'path'
+import { mkdir } from 'node:fs/promises'
+import { basename, dirname } from 'path'
 import { Writable } from 'stream'
 
 export interface Result {
@@ -23,7 +24,8 @@ export async function runTest(
     junitOutput: boolean,
     timeout: number,
     quiet: boolean = false,
-    errorsOnly: boolean = false
+    errorsOnly: boolean = false,
+    outputDir?: string
 ): Promise<Result> {
     const extraEnv = {} as Record<string, string>
     if (junitOutput) {
@@ -84,12 +86,23 @@ export async function runTest(
         output.write(`\n#\n# ${filename}\n#\n`)
     }
 
+    // Create directory structure if needed
+    if (outputToFile && outputDir) {
+        const tapFilename = `${outputDir}${filename}.tap`
+        const tapDir = dirname(tapFilename)
+        await mkdir(tapDir, { recursive: true })
+    }
+
     const parsed = new Promise<FinalResults>((resolve) => {
         const p = new Parser(resolve)
 
         if (outputToFile) {
+            const tapFilename = outputDir
+                ? `${outputDir}${filename}.tap`
+                : `${filename}.tap`
+
             proc.stdout
-                .pipe(tee(p, createWriteStream(filename + '.tap')))
+                .pipe(tee(p, createWriteStream(tapFilename)))
                 .pipe(output)
         } else {
             proc.stdout.pipe(tee(p)).pipe(output)
