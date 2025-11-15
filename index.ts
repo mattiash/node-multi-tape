@@ -75,12 +75,20 @@ function printInProgress() {
 function printTestResult(file: string, res: Result) {
     const { exitCode, result: r, executionTime } = res
     const timeStr = `${(executionTime / 1000).toFixed(1)}s`
+
     if (exitCode === 0 && r.ok) {
         console.log(`OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
-    } else if (!r.ok) {
-        console.log(`FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`)
     } else {
-        console.log(`FAIL ${file} exited with error ${exitCode}`)
+        if (!r.ok) {
+            console.log(
+                `FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
+            )
+        } else {
+            console.log(`FAIL ${file} exited with error ${exitCode}`)
+        }
+        if (argv.o) {
+            console.log(`     See ${file}.tap`)
+        }
     }
 }
 
