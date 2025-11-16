@@ -80,10 +80,12 @@ export async function runTest(
             ? process.stdout
             : new streams.WritableStreamBuffer()
 
-    if (!quiet && !errorsOnly) {
-        output.write(`\n#\n# ${filename}\n#\n`)
-    } else if (errorsOnly) {
-        output.write(`\n#\n# ${filename}\n#\n`)
+    if (!quiet) {
+        if (process.env.MT_NO_EMOJI) {
+            output.write(`\n#\n# ${filename}\n#\n`)
+        } else {
+            output.write(`\n#\n# 🚀 ${filename}\n#\n`)
+        }
     }
 
     // Create directory structure if needed

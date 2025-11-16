@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Add emojis to test summary output (✅ for OK, ❌ for FAIL) and 🚀 when starting test output.
+- Add MT_NO_EMOJI environment variable to disable emoji output
+
 ## [1.10.0] 2025-11-15
 
 ### Features

@@ -78,20 +78,25 @@ function printInProgress() {
 function printTestResult(file: string, res: Result) {
     const { exitCode, result: r, executionTime } = res
     const timeStr = `${(executionTime / 1000).toFixed(1)}s`
+    const okPrefix = process.env.MT_NO_EMOJI ? '' : '✅ '
+    const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
+    const emptyPrefix = process.env.MT_NO_EMOJI ? '' : '   '
 
     if (exitCode === 0 && r.ok) {
-        console.log(`OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
+        console.log(`${okPrefix}OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
     } else {
         if (!r.ok) {
             console.log(
-                `FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
+                `${failPrefix}FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
             )
         } else {
-            console.log(`FAIL ${file} exited with error ${exitCode}`)
+            console.log(
+                `${failPrefix}FAIL ${file} exited with error ${exitCode}`
+            )
         }
         if (argv.o || argv.O) {
             const tapFile = argv.O ? `${argv.O}${file}.tap` : `${file}.tap`
-            console.log(`     See ${tapFile}`)
+            console.log(`${emptyPrefix}     See ${tapFile}`)
         }
     }
 }
