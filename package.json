@@ -20,7 +20,7 @@
     },
     "license": "MIT",
     "dependencies": {
-        "glob": "11.0.3",
+        "glob": "11.1.0",
         "minimist": "^1.2.8",
         "stream-buffers": "^3.0.3",
         "tap-parser": "18.0.2",
