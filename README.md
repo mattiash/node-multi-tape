@@ -45,6 +45,10 @@ with output sent to stdout and print a summary at the end
   until the test is finished. Without this, the output from different tests would
   be mixed.
 
+- -P=X Run X tests per CPU core. For example, `-P 1.5` on a 4-core machine will run
+  6 tests in parallel (1.5 × 4 = 6). The result is rounded down and will always be
+  at least 1. Cannot be used together with `-p`.
+
 - -j Pass in environment variables to purple-tape to make it produce
   a junit xml-file. The output filename will be the name
   of the test-file with '.xml' appended.

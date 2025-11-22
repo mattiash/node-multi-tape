@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Add -P option for per-core parallelism (e.g., -P 1.5 on 4 cores = 6 parallel tests)
+
 ## [1.10.1] 2024-11-16
 
 ### Features

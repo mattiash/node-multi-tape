@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 import { spawn } from 'child_process'
+import { availableParallelism } from 'os'
 import { globArgs } from './lib/glob'
 import { Result, runTest } from './lib/run-test'
 import parseArgs from 'minimist'
@@ -9,6 +10,7 @@ const argv = parseArgs<{
     o: boolean
     O: string
     p: number
+    P: number
     j: boolean
     t: number
     q: boolean
@@ -19,7 +21,47 @@ const argv = parseArgs<{
     default: { p: 1, t: 0 },
 })
 
+function getCpuCount(): number {
+    try {
+        return availableParallelism()
+    } catch {
+        if (!argv.q) {
+            console.warn('Warning: Error detecting CPU cores, defaulting to 1')
+        }
+        return 1
+    }
+}
+
+function calculateParallelism(
+    pValue: number | undefined,
+    PValue: number | undefined
+): number {
+    // Validate mutual exclusivity
+    if (pValue !== undefined && PValue !== undefined) {
+        console.error('Error: Cannot specify both -p and -P flags.')
+        console.error(
+            'Use -p for absolute parallelism or -P for per-core parallelism.'
+        )
+        process.exit(1)
+    }
+
+    // Calculate per-core parallelism
+    if (PValue !== undefined) {
+        const cpuCount = getCpuCount()
+        return Math.max(1, Math.floor(PValue * cpuCount))
+    }
+
+    // Use absolute parallelism or default
+    return pValue ?? 1
+}
+
 const results = new Map<string, Result>()
+
+// Calculate effective parallelism based on -p or -P flags
+const parallelism = calculateParallelism(
+    argv.p !== 1 ? argv.p : undefined,
+    argv.P
+)
 
 const nodeArgs = new Array<string>()
 
@@ -42,6 +84,8 @@ Options:
   -O <dir>            Send output to directory (e.g., -O tapFiles/)
   --node-arg=<arg>    Pass an option to node (can be used multiple times)
   -p=<N>              Run N tests in parallel (default: 1)
+  -P=<N>              Run N tests per CPU core (e.g., -P 1.5 on 4 cores = 6 parallel tests)
+                      Cannot be used together with -p
   -j                  Generate JUnit XML output (.xml extension)
   -t <ms>             Timeout in milliseconds for each test file
   -q                  Quiet mode - only show test results as they complete
@@ -51,6 +95,7 @@ Options:
 Examples:
   multi-tape test/*.js
   multi-tape -p 4 test/*.js
+  multi-tape -P 1.5 test/*.js
   multi-tape -e -p 2 test/*.js
   multi-tape -o test/*.js
 
@@ -109,7 +154,7 @@ async function thread() {
         const result = await runTest(
             file,
             nodeArgs,
-            argv.p === 1,
+            parallelism === 1,
             argv.o || !!argv.O,
             argv.j,
             argv.t,
@@ -160,7 +205,7 @@ async function run() {
         })
     }
 
-    await Promise.all(new Array(argv.p).fill(0).map(() => thread()))
+    await Promise.all(new Array(parallelism).fill(0).map(() => thread()))
     if (controller && controllerRunning) {
         if (!argv.q && !argv.e) {
             console.log('controller: stopping')
