@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.11.1] 2025-11-23
+
+### Fixes
+
 - Update tap-parser to fix https://github.com/tapjs/tapjs/issues/1056
 - Update glob to resolve security warning.
 
