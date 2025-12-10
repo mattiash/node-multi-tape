@@ -103,7 +103,7 @@ For more information, visit: https://github.com/mattiash/node-multi-tape
 `)
 }
 
-const files = globArgs(argv._).sort()
+const files = globArgs(argv._)
 
 if (files.length === 0) {
     printHelp()

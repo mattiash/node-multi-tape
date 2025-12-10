@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Run tests in the order specified by arguments
+
 ## [1.11.1] 2025-11-23
 
 ### Fixes
