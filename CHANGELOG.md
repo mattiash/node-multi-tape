@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.11.2] 2025-12-10
+
+### Features
+
 - Run tests in the order specified by arguments
 - Abort tests properly on SIGTERM/SIGINT
 
