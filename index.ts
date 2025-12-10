@@ -112,20 +112,15 @@ if (files.length === 0) {
 
 const inProgress = new Set<string>()
 
+const okPrefix = process.env.MT_NO_EMOJI ? '' : '✅ '
+const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
+const emptyPrefix = process.env.MT_NO_EMOJI ? '' : '   '
 const aborted = new Set<string>()
-
-function printInProgress() {
-    inProgress.forEach((file) => {
-        aborted.add(file)
-    })
-}
+let abortInProgress = false
 
 function printTestResult(file: string, res: Result) {
-    const { exitCode, result: r, executionTime } = res
+    const { exitCode, result: r, executionTime, signal } = res
     const timeStr = `${(executionTime / 1000).toFixed(1)}s`
-    const okPrefix = process.env.MT_NO_EMOJI ? '' : '✅ '
-    const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
-    const emptyPrefix = process.env.MT_NO_EMOJI ? '' : '   '
 
     if (exitCode === 0 && r.ok) {
         console.log(`${okPrefix}OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
@@ -133,6 +128,10 @@ function printTestResult(file: string, res: Result) {
         if (!r.ok) {
             console.log(
                 `${failPrefix}FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
+            )
+        } else if (signal) {
+            console.log(
+                `${failPrefix}FAIL ${file} exited with signal ${signal}`
             )
         } else {
             console.log(
@@ -150,22 +149,24 @@ async function thread() {
     let file: string | undefined
     // tslint:disable-next-line:no-conditional-assignment
     while ((file = files.shift())) {
-        inProgress.add(file)
-        const result = await runTest(
-            file,
-            nodeArgs,
-            parallelism === 1,
-            argv.o || !!argv.O,
-            argv.j,
-            argv.t,
-            argv.q,
-            argv.e,
-            argv.O
-        )
-        inProgress.delete(file)
-        results.set(file, result)
-        if (argv.q) {
-            printTestResult(file, result)
+        if (!abortInProgress) {
+            inProgress.add(file)
+            const result = await runTest(
+                file,
+                nodeArgs,
+                parallelism === 1,
+                argv.o || !!argv.O,
+                argv.j,
+                argv.t,
+                argv.q,
+                argv.e,
+                argv.O
+            )
+            inProgress.delete(file)
+            results.set(file, result)
+            if (argv.q) {
+                printTestResult(file, result)
+            }
         }
     }
 }
@@ -239,7 +240,7 @@ function printSummary() {
     }
 
     if (aborted.size > 0) {
-        console.log('\nmulti-tape aborted. Tests in progress: ')
+        console.log(`\n${failPrefix}multi-tape aborted. Tests in progress: `)
         aborted.forEach((file) => console.log(`  ${file}`))
         success = false
     }
@@ -249,8 +250,16 @@ function printSummary() {
     }
 }
 
-process.on('SIGTERM', printInProgress)
-process.on('SIGINT', printInProgress)
+function abort() {
+    abortInProgress = true
+    inProgress.forEach((p) => {
+        aborted.add(p)
+    })
+    setTimeout(printSummary, 5000).unref()
+}
+
+process.on('SIGTERM', abort)
+process.on('SIGINT', abort)
 
 if (process.env.MT_DEBUG_INTERVAL) {
     setInterval(() => {

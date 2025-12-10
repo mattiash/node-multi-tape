@@ -8,10 +8,13 @@ import { mkdir } from 'node:fs/promises'
 import { basename, dirname } from 'path'
 import { Writable } from 'stream'
 
+const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
+
 export interface Result {
     exitCode: number
     executionTime: number
     result: FinalResults
+    signal: string
 }
 
 // Returns a promise that resolves whe the test has been run
@@ -49,7 +52,7 @@ export async function runTest(
                 timeout > 0
                     ? setTimeout(() => {
                           console.log(
-                              `## multi-tape: Timeout for ${basename(
+                              `multi-tape: ${failPrefix}Timeout for ${basename(
                                   filename
                               )}. Sending SIGTERM`
                           )
@@ -57,7 +60,7 @@ export async function runTest(
                           aborted = true
                           timer = setTimeout(() => {
                               console.log(
-                                  `## multi-tape: Second timeout for ${basename(
+                                  `multi-tape: ${failPrefix}Second timeout for ${basename(
                                       filename
                                   )}. Sending SIGKILL`
                               )
@@ -135,14 +138,10 @@ export async function runTest(
         }
     }
 
-    if (signal && !quiet && !errorsOnly) {
-        console.log(`${filename} exited with signal ${signal}`)
-    } else if (signal && errorsOnly && (exitCode !== 0 || !result.ok)) {
-        console.log(`${filename} exited with signal ${signal}`)
-    }
     return {
         exitCode,
         executionTime: endTime - startTime,
         result,
+        signal,
     }
 }
