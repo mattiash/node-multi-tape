@@ -207,15 +207,32 @@ async function run() {
     }
 
     await Promise.all(new Array(parallelism).fill(0).map(() => thread()))
+
     if (controller && controllerRunning) {
         if (!argv.q && !argv.e) {
             console.log('controller: stopping')
         }
-        controller.once('close', () => printSummary())
+
+        // Set up a timeout in case the controller doesn't exit cleanly
+        const killTimeout = setTimeout(() => {
+            if (!argv.q && !argv.e) {
+                console.warn(
+                    'controller: did not exit after SIGTERM, sending SIGKILL'
+                )
+            }
+            controller?.kill('SIGKILL')
+        }, 5000).unref()
+
+        controller.once('close', () => {
+            clearTimeout(killTimeout)
+        })
+
         controller.kill()
-    } else {
-        printSummary()
+        controller.stdout?.destroy()
+        controller.stderr?.destroy()
     }
+
+    printSummary()
 }
 
 function printSummary() {
