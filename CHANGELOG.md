@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.11.3] 2026-02-10
+
+### Fixes
+
 - Improve robustness for --controller process handling
 
 ## [1.11.2] 2025-12-10
