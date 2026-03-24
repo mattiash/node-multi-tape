@@ -10,6 +10,7 @@ test("Glob parses this project's test/*.ts", async (t) => {
         result.sort(),
         [
             'test/test-aaa-large-output.ts',
+            'test/test-controller-early-exit.ts',
             'test/test-glob.ts',
             'test/test-never-exit.ts',
         ],
@@ -38,6 +39,7 @@ test('A combination of different inputs', (t) => {
 
     t.deepEqual(result.sort(), [
         'test/test-aaa-large-output.ts',
+        'test/test-controller-early-exit.ts',
         'test/test-glob.ts',
         'test/test-glob.ts',
         'test/test-never-exit.ts',

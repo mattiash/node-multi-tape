@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixes
+
+- Detect controller early exit as a fatal error: print buffered stdout/stderr, print "controller exited unexpectedly", abort remaining tests, and exit non-zero
+
 ## [1.11.3] 2026-02-10
 
 ### Fixes

@@ -174,6 +174,9 @@ async function thread() {
 async function run() {
     let controller: ReturnType<typeof spawn> | undefined
     let controllerRunning = false
+    let controllerKilledByUs = false
+    let stdoutBuffer = ''
+    let stderrBuffer = ''
     if (argv.controller) {
         await new Promise<void>((resolve, reject) => {
             controller = spawn(argv.controller, [], {
@@ -182,14 +185,18 @@ async function run() {
             })
 
             controller.stdout?.on('data', (data) => {
+                stdoutBuffer += data
                 if (!argv.q && !argv.e) {
                     console.log(`controller: ${data}`)
                 }
-                controllerRunning = true
-                resolve()
+                if (!controllerRunning) {
+                    controllerRunning = true
+                    resolve()
+                }
             })
 
             controller.stderr?.on('data', (data) => {
+                stderrBuffer += data
                 if (!argv.q && !argv.e) {
                     console.error(`controller: ${data}`)
                 }
@@ -201,6 +208,16 @@ async function run() {
             })
 
             controller.on('close', () => {
+                if (controllerRunning && !controllerKilledByUs) {
+                    if (stderrBuffer) {
+                        console.error(stderrBuffer)
+                    }
+                    if (stdoutBuffer) {
+                        console.log(stdoutBuffer)
+                    }
+                    console.error('controller exited unexpectedly')
+                    abort()
+                }
                 controllerRunning = false
             })
         })
@@ -227,6 +244,7 @@ async function run() {
             clearTimeout(killTimeout)
         })
 
+        controllerKilledByUs = true
         controller.kill()
         controller.stdout?.destroy()
         controller.stderr?.destroy()
