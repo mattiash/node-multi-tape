@@ -12,7 +12,11 @@ test('retry: always-failing test is retried N times then exits 1', async (t) => 
     const { exitCode, output } = await runMultiTape(['--retry=2', FAIL])
     t.equal(exitCode, 1, 'exits 1 after all retries exhausted')
     const retryCount = (output.match(/RETRY/g) ?? []).length
-    t.equal(retryCount, 2, 'RETRY appears once per retry decision (2 retries = 2 lines)')
+    t.equal(
+        retryCount,
+        2,
+        'RETRY appears once per retry decision (2 retries = 2 lines)'
+    )
 })
 
 test('retry: correct tap files created for each attempt', async (t) => {
@@ -24,9 +28,18 @@ test('retry: correct tap files created for each attempt', async (t) => {
             FAIL,
         ])
         t.equal(exitCode, 1, 'exits 1')
-        t.ok(existsSync(join(outDir, `${FAIL}.tap`)), 'original attempt .tap created')
-        t.ok(existsSync(join(outDir, `${FAIL}.retry1.tap`)), '.retry1.tap created')
-        t.ok(existsSync(join(outDir, `${FAIL}.retry2.tap`)), '.retry2.tap created')
+        t.ok(
+            existsSync(join(outDir, `${FAIL}.tap`)),
+            'original attempt .tap created'
+        )
+        t.ok(
+            existsSync(join(outDir, `${FAIL}.retry1.tap`)),
+            '.retry1.tap created'
+        )
+        t.ok(
+            existsSync(join(outDir, `${FAIL}.retry2.tap`)),
+            '.retry2.tap created'
+        )
     } finally {
         rmSync(outDir, { recursive: true, force: true })
     }
@@ -56,7 +69,10 @@ test('retry: test that fails once then passes exits 0 with RETRY then OK', async
             { FAIL_ONCE_MARKER: marker }
         )
         t.equal(exitCode, 0, 'exits 0 after passing on retry')
-        t.ok(output.includes('RETRY'), 'RETRY line present for the failed first attempt')
+        t.ok(
+            output.includes('RETRY'),
+            'RETRY line present for the failed first attempt'
+        )
         t.ok(output.includes('OK'), 'OK line present in summary')
     } finally {
         if (existsSync(marker)) unlinkSync(marker)
@@ -75,7 +91,11 @@ test('retry: before-each re-runs on each retry attempt', async (t) => {
         ])
         t.equal(exitCode, 1, 'exits 1 (test always fails)')
         const lines = readFileSync(counter, 'utf8').trim().split('\n')
-        t.equal(lines.length, 3, 'before-each ran 3 times (original + 2 retries)')
+        t.equal(
+            lines.length,
+            3,
+            'before-each ran 3 times (original + 2 retries)'
+        )
     } finally {
         if (existsSync(counter)) unlinkSync(counter)
     }

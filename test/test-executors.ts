@@ -10,7 +10,10 @@ test('executors: MULTI_TAPE_EXECUTOR is set to executor name', async (t) => {
         FIXTURE,
     ])
     t.equal(exitCode, 0, 'exits 0')
-    t.ok(output.includes('MULTI_TAPE_EXECUTOR=worker1'), 'executor name appears in output')
+    t.ok(
+        output.includes('MULTI_TAPE_EXECUTOR=worker1'),
+        'executor name appears in output'
+    )
 })
 
 test('executors: each executor name appears when running multiple tests', async (t) => {
@@ -20,13 +23,17 @@ test('executors: each executor name appears when running multiple tests', async 
         FIXTURE,
     ])
     t.equal(exitCode, 0, 'exits 0')
-    t.ok(output.includes('MULTI_TAPE_EXECUTOR=alpha'), 'alpha appears in output')
+    t.ok(
+        output.includes('MULTI_TAPE_EXECUTOR=alpha'),
+        'alpha appears in output'
+    )
     t.ok(output.includes('MULTI_TAPE_EXECUTOR=beta'), 'beta appears in output')
 })
 
 test('executors: mutually exclusive with -p', async (t) => {
     const { exitCode, output } = await runMultiTape([
-        '-p', '2',
+        '-p',
+        '2',
         '--executors=a',
         PASS,
     ])
@@ -36,7 +43,8 @@ test('executors: mutually exclusive with -p', async (t) => {
 
 test('executors: mutually exclusive with -P', async (t) => {
     const { exitCode, output } = await runMultiTape([
-        '-P', '1',
+        '-P',
+        '1',
         '--executors=a',
         PASS,
     ])

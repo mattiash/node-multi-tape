@@ -209,7 +209,6 @@ async function thread(executorName?: string): Promise<number> {
             let result!: Result
             let retryNumber = 0
 
-            // eslint-disable-next-line no-constant-condition
             while (true) {
                 // Run before-each before every attempt, including retries
                 if (argv['before-each']) {

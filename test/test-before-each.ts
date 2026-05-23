@@ -21,7 +21,10 @@ test('before-each: non-zero exit blocks test', async (t) => {
         PASS,
     ])
     t.equal(exitCode, 1, 'exits 1 when before-each fails')
-    t.ok(output.includes('before-each command failed'), 'failure reason in output')
+    t.ok(
+        output.includes('before-each command failed'),
+        'failure reason in output'
+    )
 })
 
 test('before-each: TAP not-ok exit blocks test', async (t) => {
@@ -30,7 +33,10 @@ test('before-each: TAP not-ok exit blocks test', async (t) => {
         PASS,
     ])
     t.equal(exitCode, 1, 'exits 1 when before-each TAP fails')
-    t.ok(output.includes('before-each command failed'), 'failure reason in output')
+    t.ok(
+        output.includes('before-each command failed'),
+        'failure reason in output'
+    )
 })
 
 test('before-each: MULTI_TAPE_EXECUTOR is set in before-each env', async (t) => {
@@ -40,7 +46,10 @@ test('before-each: MULTI_TAPE_EXECUTOR is set in before-each env', async (t) => 
         PASS,
     ])
     t.equal(exitCode, 1, 'exits 1 (before-each fails)')
-    t.ok(output.includes('EXECUTOR=exec1'), 'executor name appears in inline before-each output')
+    t.ok(
+        output.includes('EXECUTOR=exec1'),
+        'executor name appears in inline before-each output'
+    )
 })
 
 test('before-each: output written to file when -O is set', async (t) => {
@@ -55,7 +64,10 @@ test('before-each: output written to file when -O is set', async (t) => {
         const tapFile = join(outDir, `${PASS}.before-each.tap`)
         t.ok(existsSync(tapFile), '.before-each.tap file created')
         const contents = readFileSync(tapFile, 'utf8')
-        t.ok(contents.includes('UNIQUE_MARKER_12345'), 'before-each output in tap file')
+        t.ok(
+            contents.includes('UNIQUE_MARKER_12345'),
+            'before-each output in tap file'
+        )
     } finally {
         rmSync(outDir, { recursive: true, force: true })
     }
@@ -67,5 +79,8 @@ test('before-each: output printed inline when no -O/-o flag', async (t) => {
         PASS,
     ])
     t.equal(exitCode, 1, 'exits 1')
-    t.ok(output.includes('INLINE_MARKER_67890'), 'before-each output appears inline')
+    t.ok(
+        output.includes('INLINE_MARKER_67890'),
+        'before-each output appears inline'
+    )
 })
