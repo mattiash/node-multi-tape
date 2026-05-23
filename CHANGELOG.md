@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.13.0] 2026-05-23
+
 ### Features
 
 - `--retry=N` retries each failing test up to N times. A `🔄 RETRY` status line is printed immediately when a retry is triggered. Tap files from each attempt are preserved with distinct names: `.tap` for the first attempt, `.retry1.tap`, `.retry2.tap`, … for subsequent ones.
