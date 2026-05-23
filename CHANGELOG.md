@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Print total wall-clock runtime at end of every run
+- Print per-executor idle times at end of run when using `-p` or `-P` (helps identify scheduling imbalance)
+- Auto-read `.multi-tape-timing.json` from the working directory and reorder tests slowest-first to minimise wall time; unknown tests run last
+- `--update-timings` flag writes `.multi-tape-timing.json` with per-test runtimes after a clean run (alphabetically sorted, human-readable JSON)
+
 ### Fixes
 
 - Fix double-printing of controller stdout/stderr on early exit: in default mode output was already printed live, so skip the buffer dump; only dump buffers in -q/-e mode where live output was suppressed. Also print the "controller exited unexpectedly" message before the buffer dump.

@@ -64,6 +64,14 @@ with output sent to stdout and print a summary at the end
 
 - --controller="command with parameters" Run a command before starting the tests. Wait for the command to print something on stdout before starting the tests. Kill the command when all tests are done.
 
+- --update-timings Write `.multi-tape-timing.json` in the working directory with the runtime of each test file after a clean run. The file is human-readable JSON, sorted alphabetically. Add it to `.gitignore` to avoid committing it on every run.
+
+  If `.multi-tape-timing.json` already exists it is read automatically at startup and tests are reordered slowest-first to minimise total wall time. Test files not present in the file are assumed to be fast and run last.
+
+## Summary output
+
+At the end of every run multi-tape prints the total wall-clock runtime. When running with `-p` or `-P`, it also prints how long each executor was idle at the end — a large idle time indicates that reordering tests with `--update-timings` could reduce the total runtime.
+
 ## Exit code
 
 multi-tape exits with code 1 if any test failed as shown by the tap-results or

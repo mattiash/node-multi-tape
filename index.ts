@@ -2,6 +2,7 @@
 
 import { spawn } from 'child_process'
 import { availableParallelism } from 'os'
+import { readFile, writeFile } from 'node:fs/promises'
 import { globArgs } from './lib/glob'
 import { Result, runTest } from './lib/run-test'
 import parseArgs from 'minimist'
@@ -15,11 +16,14 @@ const argv = parseArgs<{
     t: number
     q: boolean
     e: boolean
+    'update-timings': boolean
 }>(process.argv.slice(2), {
-    boolean: ['o', 'j', 'q', 'e'],
+    boolean: ['o', 'j', 'q', 'e', 'update-timings'],
     string: ['O'],
     default: { p: 1, t: 0 },
 })
+
+const TIMINGS_FILE = '.multi-tape-timing.json'
 
 function getCpuCount(): number {
     try {
@@ -57,6 +61,10 @@ function calculateParallelism(
 
 const results = new Map<string, Result>()
 
+let runStartTime = 0
+let runEndTime = 0
+let threadLastCompletionTimes: number[] = []
+
 // Calculate effective parallelism based on -p or -P flags
 const parallelism = calculateParallelism(
     argv.p !== 1 ? argv.p : undefined,
@@ -91,6 +99,7 @@ Options:
   -q                  Quiet mode - only show test results as they complete
   -e                  Errors-only mode - only show output from failing tests
   --controller=<cmd>  Run a command before tests, kill it when done
+  --update-timings    Write .multi-tape-timing.json with per-test runtimes after a clean run
 
 Examples:
   multi-tape test/*.js
@@ -145,8 +154,9 @@ function printTestResult(file: string, res: Result) {
     }
 }
 
-async function thread() {
+async function thread(): Promise<number> {
     let file: string | undefined
+    let lastCompletionTime = Date.now()
     // tslint:disable-next-line:no-conditional-assignment
     while ((file = files.shift())) {
         if (!abortInProgress) {
@@ -164,11 +174,13 @@ async function thread() {
             )
             inProgress.delete(file)
             results.set(file, result)
+            lastCompletionTime = Date.now()
             if (argv.q) {
                 printTestResult(file, result)
             }
         }
     }
+    return lastCompletionTime
 }
 
 async function run() {
@@ -225,7 +237,27 @@ async function run() {
         })
     }
 
-    await Promise.all(new Array(parallelism).fill(0).map(() => thread()))
+    try {
+        const content = await readFile(TIMINGS_FILE, 'utf8')
+        const timings: Record<string, number> = JSON.parse(content)
+        files.sort((a, b) => (timings[b] ?? -1) - (timings[a] ?? -1))
+    } catch {
+        // No timings file or unreadable — proceed with original order
+    }
+
+    runStartTime = Date.now()
+    threadLastCompletionTimes = await Promise.all(
+        new Array(parallelism).fill(0).map(() => thread())
+    )
+    runEndTime = Date.now()
+
+    if (argv['update-timings'] && !abortInProgress) {
+        const timings: Record<string, number> = {}
+        for (const key of [...results.keys()].sort()) {
+            timings[key] = results.get(key)!.executionTime
+        }
+        await writeFile(TIMINGS_FILE, JSON.stringify(timings, null, 2) + '\n')
+    }
 
     if (controller && controllerRunning) {
         if (!argv.q && !argv.e) {
@@ -273,6 +305,18 @@ function printSummary() {
             if (res.exitCode !== 0 || !res.result.ok) {
                 success = false
             }
+        }
+    }
+
+    if (runStartTime > 0) {
+        const displayEnd = runEndTime || Date.now()
+        const wallTime = displayEnd - runStartTime
+        console.log(`\nTotal: ${(wallTime / 1000).toFixed(1)}s`)
+        if (parallelism > 1 && threadLastCompletionTimes.length > 0) {
+            const idleStrs = threadLastCompletionTimes
+                .map((t) => `${((displayEnd - t) / 1000).toFixed(1)}s`)
+                .join(', ')
+            console.log(`Executor idle times: ${idleStrs}`)
         }
     }
 
