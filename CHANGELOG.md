@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixes
+
+- Fix race condition where controller early exit was not detected as a failure when no tests had started yet: exit code was 0 instead of 1
+- Update transitive dependencies to resolve Dependabot security alerts (minimatch, flatted, yaml, picomatch, js-yaml, brace-expansion, ajv)
+
 ## [1.12.0] 2026-05-23
 
 ### Features

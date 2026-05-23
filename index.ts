@@ -120,6 +120,7 @@ if (files.length === 0) {
 }
 
 const inProgress = new Set<string>()
+let controllerExitedUnexpectedly = false
 
 const okPrefix = process.env.MT_NO_EMOJI ? '' : '✅ '
 const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
@@ -221,6 +222,7 @@ async function run() {
 
             controller.on('close', () => {
                 if (controllerRunning && !controllerKilledByUs) {
+                    controllerExitedUnexpectedly = true
                     console.error('controller exited unexpectedly')
                     if (argv.q || argv.e) {
                         if (stderrBuffer) {
@@ -323,6 +325,10 @@ function printSummary() {
     if (aborted.size > 0) {
         console.log(`\n${failPrefix}multi-tape aborted. Tests in progress: `)
         aborted.forEach((file) => console.log(`  ${file}`))
+        success = false
+    }
+
+    if (controllerExitedUnexpectedly) {
         success = false
     }
 
