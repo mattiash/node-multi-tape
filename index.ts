@@ -2,9 +2,11 @@
 
 import { spawn } from 'child_process'
 import { availableParallelism } from 'os'
-import { readFile, writeFile } from 'node:fs/promises'
+import { readFile, writeFile, mkdir } from 'node:fs/promises'
+import { dirname } from 'node:path'
 import { globArgs } from './lib/glob'
-import { Result, runTest } from './lib/run-test'
+import { Result, FailedAttempt, runTest, runBeforeEach } from './lib/run-test'
+import type { FinalResults } from 'tap-parser'
 import parseArgs from 'minimist'
 
 const argv = parseArgs<{
@@ -17,11 +19,18 @@ const argv = parseArgs<{
     q: boolean
     e: boolean
     'update-timings': boolean
+    executors: string
+    'before-each': string
+    retry: number
+    '--': string[]
 }>(process.argv.slice(2), {
     boolean: ['o', 'j', 'q', 'e', 'update-timings'],
-    string: ['O'],
-    default: { p: 1, t: 0 },
+    string: ['O', 'executors', 'before-each'],
+    default: { p: 1, t: 0, retry: 0 },
+    '--': true,
 })
+
+const passthroughArgs: string[] = argv['--'] ?? []
 
 const TIMINGS_FILE = '.multi-tape-timing.json'
 
@@ -38,26 +47,34 @@ function getCpuCount(): number {
 
 function calculateParallelism(
     pValue: number | undefined,
-    PValue: number | undefined
+    PValue: number | undefined,
+    executorsValue: string | undefined
 ): number {
-    // Validate mutual exclusivity
-    if (pValue !== undefined && PValue !== undefined) {
-        console.error('Error: Cannot specify both -p and -P flags.')
+    const flagCount = [pValue, PValue, executorsValue].filter(
+        (v) => v !== undefined
+    ).length
+    if (flagCount > 1) {
         console.error(
-            'Use -p for absolute parallelism or -P for per-core parallelism.'
+            'Error: Cannot specify more than one of -p, -P, and --executors.'
         )
         process.exit(1)
     }
 
-    // Calculate per-core parallelism
     if (PValue !== undefined) {
         const cpuCount = getCpuCount()
         return Math.max(1, Math.floor(PValue * cpuCount))
     }
 
-    // Use absolute parallelism or default
+    if (executorsValue !== undefined) {
+        return executorsValue.split(',').length
+    }
+
     return pValue ?? 1
 }
+
+const executorList: string[] | undefined = argv.executors
+    ? argv.executors.split(',')
+    : undefined
 
 const results = new Map<string, Result>()
 
@@ -65,10 +82,11 @@ let runStartTime = 0
 let runEndTime = 0
 let threadLastCompletionTimes: number[] = []
 
-// Calculate effective parallelism based on -p or -P flags
+// Calculate effective parallelism based on -p, -P, or --executors
 const parallelism = calculateParallelism(
     argv.p !== 1 ? argv.p : undefined,
-    argv.P
+    argv.P,
+    argv.executors
 )
 
 const nodeArgs = new Array<string>()
@@ -94,12 +112,18 @@ Options:
   -p=<N>              Run N tests in parallel (default: 1)
   -P=<N>              Run N tests per CPU core (e.g., -P 1.5 on 4 cores = 6 parallel tests)
                       Cannot be used together with -p
+  --executors=<list>  Comma-separated named executors (e.g., --executors=a,b,c); sets parallelism
+                      to the number of executors and passes MULTI_TAPE_EXECUTOR to each test.
+                      Cannot be used together with -p or -P
   -j                  Generate JUnit XML output (.xml extension)
   -t <ms>             Timeout in milliseconds for each test file
   -q                  Quiet mode - only show test results as they complete
   -e                  Errors-only mode - only show output from failing tests
+  --retry=<N>         Retry failing tests up to N times (tap files: .tap, .retry1.tap, ...)
+  --before-each=<cmd> Run a command before each test; test is skipped if the command fails
   --controller=<cmd>  Run a command before tests, kill it when done
   --update-timings    Write .multi-tape-timing.json with per-test runtimes after a clean run
+  -- <args>           Pass remaining arguments to each test file
 
 Examples:
   multi-tape test/*.js
@@ -107,6 +131,7 @@ Examples:
   multi-tape -P 1.5 test/*.js
   multi-tape -e -p 2 test/*.js
   multi-tape -o test/*.js
+  multi-tape test/*.js -- --grep "my test"
 
 For more information, visit: https://github.com/mattiash/node-multi-tape
 `)
@@ -124,6 +149,7 @@ let controllerExitedUnexpectedly = false
 
 const okPrefix = process.env.MT_NO_EMOJI ? '' : '✅ '
 const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
+const retryPrefix = process.env.MT_NO_EMOJI ? '' : '🔄 '
 const emptyPrefix = process.env.MT_NO_EMOJI ? '' : '   '
 const aborted = new Set<string>()
 let abortInProgress = false
@@ -131,6 +157,14 @@ let abortInProgress = false
 function printTestResult(file: string, res: Result) {
     const { exitCode, result: r, executionTime, signal } = res
     const timeStr = `${(executionTime / 1000).toFixed(1)}s`
+
+    if (res.beforeEachFailed) {
+        console.log(`${failPrefix}FAIL ${file} (before-each command failed)`)
+        if (res.beforeEachFile) {
+            console.log(`${emptyPrefix}     See ${res.beforeEachFile}`)
+        }
+        return
+    }
 
     if (exitCode === 0 && r.ok) {
         console.log(`${okPrefix}OK   ${file} (${timeStr}) ${r.pass}/${r.count}`)
@@ -149,30 +183,113 @@ function printTestResult(file: string, res: Result) {
             )
         }
         if (argv.o || argv.O) {
-            const tapFile = argv.O ? `${argv.O}${file}.tap` : `${file}.tap`
+            const retryCount = res.retries?.length ?? 0
+            const tapFile =
+                retryCount > 0
+                    ? argv.O
+                        ? `${argv.O}${file}.retry${retryCount}.tap`
+                        : `${file}.retry${retryCount}.tap`
+                    : argv.O
+                      ? `${argv.O}${file}.tap`
+                      : `${file}.tap`
             console.log(`${emptyPrefix}     See ${tapFile}`)
         }
     }
 }
 
-async function thread(): Promise<number> {
+async function thread(executorName?: string): Promise<number> {
     let file: string | undefined
     let lastCompletionTime = Date.now()
     // tslint:disable-next-line:no-conditional-assignment
     while ((file = files.shift())) {
         if (!abortInProgress) {
             inProgress.add(file)
-            const result = await runTest(
-                file,
-                nodeArgs,
-                parallelism === 1,
-                argv.o || !!argv.O,
-                argv.j,
-                argv.t,
-                argv.q,
-                argv.e,
-                argv.O
-            )
+
+            const priorAttempts: FailedAttempt[] = []
+            let result!: Result
+            let retryNumber = 0
+
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+                // Run before-each before every attempt, including retries
+                if (argv['before-each']) {
+                    const beforeEach = await runBeforeEach(
+                        argv['before-each'],
+                        executorName
+                    )
+                    if (!beforeEach.ok) {
+                        let beforeEachFile: string | undefined
+                        if (argv.o || argv.O) {
+                            beforeEachFile = argv.O
+                                ? `${argv.O}${file}.before-each.tap`
+                                : `${file}.before-each.tap`
+                            await mkdir(dirname(beforeEachFile), {
+                                recursive: true,
+                            })
+                            await writeFile(beforeEachFile, beforeEach.output)
+                        } else {
+                            process.stdout.write(beforeEach.output)
+                        }
+                        result = {
+                            exitCode: 1,
+                            executionTime: 0,
+                            result: { ok: false } as FinalResults,
+                            signal: '',
+                            beforeEachFailed: true,
+                            beforeEachFile,
+                        }
+                        break
+                    }
+                }
+
+                result = await runTest(
+                    file,
+                    nodeArgs,
+                    parallelism === 1,
+                    argv.o || !!argv.O,
+                    argv.j,
+                    argv.t,
+                    argv.q,
+                    argv.e,
+                    argv.O,
+                    passthroughArgs,
+                    executorName,
+                    retryNumber
+                )
+
+                const failed = result.exitCode !== 0 || !result.result.ok
+                if (failed && retryNumber < argv.retry) {
+                    const tapFile =
+                        retryNumber === 0
+                            ? argv.O
+                                ? `${argv.O}${file}.tap`
+                                : `${file}.tap`
+                            : argv.O
+                              ? `${argv.O}${file}.retry${retryNumber}.tap`
+                              : `${file}.retry${retryNumber}.tap`
+                    priorAttempts.push({
+                        executionTime: result.executionTime,
+                        result: result.result,
+                        tapFile,
+                    })
+                    const timeStr = `${(result.executionTime / 1000).toFixed(1)}s`
+                    const r = result.result
+                    console.log(
+                        `${retryPrefix}RETRY ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
+                    )
+                    if (argv.o || argv.O) {
+                        console.log(`${emptyPrefix}     See ${tapFile}`)
+                    }
+                    retryNumber++
+                } else {
+                    break
+                }
+            }
+
+            if (!result.beforeEachFailed && priorAttempts.length > 0) {
+                result = { ...result, retries: priorAttempts }
+            }
+
             inProgress.delete(file)
             results.set(file, result)
             lastCompletionTime = Date.now()
@@ -249,7 +366,9 @@ async function run() {
 
     runStartTime = Date.now()
     threadLastCompletionTimes = await Promise.all(
-        new Array(parallelism).fill(0).map(() => thread())
+        executorList
+            ? executorList.map((name) => thread(name))
+            : new Array(parallelism).fill(0).map(() => thread())
     )
     runEndTime = Date.now()
 

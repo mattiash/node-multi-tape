@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- `--retry=N` retries each failing test up to N times. A `🔄 RETRY` status line is printed immediately when a retry is triggered. Tap files from each attempt are preserved with distinct names: `.tap` for the first attempt, `.retry1.tap`, `.retry2.tap`, … for subsequent ones.
+- `--before-each="command"` runs a shell command before each test (and before each retry attempt). The command must produce TAP output; a failure blocks the test from running. The `MULTI_TAPE_EXECUTOR` environment variable is set when `--executors` is also active. On failure, output is printed inline or written to `<test>.before-each.tap` when `-o`/`-O` is in use.
+- `--executors=exec1,exec2,...` runs tests with a fixed set of named executors instead of a numeric parallelism count. The executor name is passed to each test and its before-each command as `MULTI_TAPE_EXECUTOR`. Cannot be combined with `-p` or `-P`.
+- `-- arg1 arg2 ...` passes extra arguments to every spawned test process.
+
 ## [1.12.1] 2026-05-23
 
 ### Fixes

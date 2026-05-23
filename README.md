@@ -68,6 +68,22 @@ with output sent to stdout and print a summary at the end
 
   If `.multi-tape-timing.json` already exists it is read automatically at startup and tests are reordered slowest-first to minimise total wall time. Test files not present in the file are assumed to be fast and run last.
 
+- --retry=N Retry each failing test up to N times. A `🔄 RETRY` status line is printed immediately when a test fails and will be retried. Tap files for each attempt are named differently to preserve them all: the original attempt uses the normal `.tap` name, and retries use `.retry1.tap`, `.retry2.tap`, and so on.
+
+- --before-each="command" Run a shell command before each test file (and before each retry attempt). The command must produce TAP output. If it exits non-zero or its TAP output contains a failure, the test is not run and is reported as failed. The environment variable `MULTI_TAPE_EXECUTOR` is set when `--executors` is also in use.
+
+  Without `-o`/`-O`, a failing before-each command's output is printed inline. With `-o`/`-O`, it is written to a sidecar file named `<test-file>.before-each.tap`.
+
+- --executors=exec1,exec2,... Run tests using a fixed set of named executors instead of a numeric parallelism count. Each executor runs one test at a time, so the number of executors determines how many tests run in parallel. The executor name is passed to each test and its before-each command as the `MULTI_TAPE_EXECUTOR` environment variable. Cannot be combined with `-p` or `-P`.
+
+  Executors are just strings to multi-tape — their meaning is entirely up to the test and before-each command.
+
+- `-- arg1 arg2 ...` Pass extra arguments to every test file. Arguments after `--` are appended to the command line of each spawned test process.
+
+  ```
+  multi-tape test/*.js -- --grep "my test"
+  ```
+
 ## Summary output
 
 At the end of every run multi-tape prints the total wall-clock runtime. When running with `-p` or `-P`, it also prints how long each executor was idle at the end — a large idle time indicates that reordering tests with `--update-timings` could reduce the total runtime.

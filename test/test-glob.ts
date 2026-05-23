@@ -10,9 +10,13 @@ test("Glob parses this project's test/*.ts", async (t) => {
         result.sort(),
         [
             'test/test-aaa-large-output.ts',
+            'test/test-before-each.ts',
             'test/test-controller-early-exit.ts',
+            'test/test-executors.ts',
             'test/test-glob.ts',
             'test/test-never-exit.ts',
+            'test/test-passthrough.ts',
+            'test/test-retry.ts',
         ],
         'shall return an array of filenames'
     )
@@ -39,10 +43,14 @@ test('A combination of different inputs', (t) => {
 
     t.deepEqual(result.sort(), [
         'test/test-aaa-large-output.ts',
+        'test/test-before-each.ts',
         'test/test-controller-early-exit.ts',
+        'test/test-executors.ts',
         'test/test-glob.ts',
         'test/test-glob.ts',
         'test/test-never-exit.ts',
+        'test/test-passthrough.ts',
+        'test/test-retry.ts',
         'wibble/*.wibblet',
         'wibble/wibble123.example',
     ])

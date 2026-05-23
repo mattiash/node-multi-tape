@@ -16,5 +16,5 @@
         "outDir": "build/",
         "esModuleInterop": true
     },
-    "include": ["index.ts", "lib/*.ts", "test/*.ts", "test-fail/*.ts"]
+    "include": ["index.ts", "lib/*.ts", "test/*.ts", "test-fail/*.ts", "test-fixtures/*.ts"]
 }

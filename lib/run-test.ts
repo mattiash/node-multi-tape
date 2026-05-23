@@ -10,11 +10,60 @@ import { Writable } from 'stream'
 
 const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
 
+export interface FailedAttempt {
+    executionTime: number
+    result: FinalResults
+    tapFile: string
+}
+
 export interface Result {
     exitCode: number
     executionTime: number
     result: FinalResults
     signal: string
+    beforeEachFailed?: boolean
+    beforeEachFile?: string
+    retries?: FailedAttempt[]
+}
+
+export interface BeforeEachResult {
+    ok: boolean
+    output: string
+}
+
+export async function runBeforeEach(
+    cmd: string,
+    executor: string | undefined
+): Promise<BeforeEachResult> {
+    const env: Record<string, string> = { ...process.env } as Record<
+        string,
+        string
+    >
+    if (executor !== undefined) {
+        env.MULTI_TAPE_EXECUTOR = executor
+    }
+
+    const proc = spawn(cmd, [], { shell: true, env })
+
+    let output = ''
+    proc.stdout.on('data', (data: Buffer) => {
+        output += data
+    })
+    proc.stderr.on('data', (data: Buffer) => {
+        output += data
+    })
+
+    const tapResult = await new Promise<FinalResults>((resolve) => {
+        const p = new Parser(resolve)
+        proc.stdout.pipe(p)
+    })
+
+    const exitCode = await new Promise<number>((resolve) => {
+        proc.on('exit', (code: number | null) => resolve(code ?? 1))
+    })
+
+    const ok = tapResult.ok && exitCode === 0
+    return { ok, output }
 }
 
 // Returns a promise that resolves whe the test has been run
@@ -28,17 +77,23 @@ export async function runTest(
     timeout: number,
     quiet: boolean = false,
     errorsOnly: boolean = false,
-    outputDir?: string
+    outputDir?: string,
+    extraArgs: string[] = [],
+    executor?: string,
+    retryNumber: number = 0
 ): Promise<Result> {
     const extraEnv = {} as Record<string, string>
     if (junitOutput) {
         extraEnv.PT_XUNIT_FILE = filename + '.xml'
         extraEnv.PT_XUNIT_NAME = basename(filename)
     }
+    if (executor !== undefined) {
+        extraEnv.MULTI_TAPE_EXECUTOR = executor
+    }
 
     const startTime = Date.now()
 
-    const proc = spawn('node', nodeArgs.concat(filename), {
+    const proc = spawn('node', [...nodeArgs, filename, ...extraArgs], {
         env: {
             ...process.env,
             ...extraEnv,
@@ -91,9 +146,11 @@ export async function runTest(
         }
     }
 
+    const retrySuffix = retryNumber > 0 ? `.retry${retryNumber}` : ''
+
     // Create directory structure if needed
     if (outputToFile && outputDir) {
-        const tapFilename = `${outputDir}${filename}.tap`
+        const tapFilename = `${outputDir}${filename}${retrySuffix}.tap`
         const tapDir = dirname(tapFilename)
         await mkdir(tapDir, { recursive: true })
     }
@@ -103,8 +160,8 @@ export async function runTest(
 
         if (outputToFile) {
             const tapFilename = outputDir
-                ? `${outputDir}${filename}.tap`
-                : `${filename}.tap`
+                ? `${outputDir}${filename}${retrySuffix}.tap`
+                : `${filename}${retrySuffix}.tap`
 
             proc.stdout
                 .pipe(tee(p, createWriteStream(tapFilename)))
