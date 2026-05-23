@@ -209,13 +209,15 @@ async function run() {
 
             controller.on('close', () => {
                 if (controllerRunning && !controllerKilledByUs) {
-                    if (stderrBuffer) {
-                        console.error(stderrBuffer)
-                    }
-                    if (stdoutBuffer) {
-                        console.log(stdoutBuffer)
-                    }
                     console.error('controller exited unexpectedly')
+                    if (argv.q || argv.e) {
+                        if (stderrBuffer) {
+                            console.error(stderrBuffer)
+                        }
+                        if (stdoutBuffer) {
+                            console.log(stdoutBuffer)
+                        }
+                    }
                     abort()
                 }
                 controllerRunning = false

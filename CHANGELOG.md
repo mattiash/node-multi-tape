@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixes
+
+- Fix double-printing of controller stdout/stderr on early exit: in default mode output was already printed live, so skip the buffer dump; only dump buffers in -q/-e mode where live output was suppressed. Also print the "controller exited unexpectedly" message before the buffer dump.
+
 ## [1.11.4] 2026-03-24
 
 ### Fixes
