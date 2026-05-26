@@ -84,7 +84,9 @@ export async function runTest(
 ): Promise<Result> {
     const extraEnv = {} as Record<string, string>
     if (junitOutput) {
-        extraEnv.PT_XUNIT_FILE = outputDir ? `${outputDir}${filename}.xml` : filename + '.xml'
+        extraEnv.PT_XUNIT_FILE = outputDir
+            ? `${outputDir}${filename}.xml`
+            : filename + '.xml'
         extraEnv.PT_XUNIT_NAME = basename(filename)
     }
     if (executor !== undefined) {
