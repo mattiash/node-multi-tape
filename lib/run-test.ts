@@ -126,7 +126,7 @@ export async function runTest(
                       }, timeout)
                     : undefined
 
-            proc.on('exit', (exitCode: number, signal: string) => {
+            proc.on('close', (exitCode: number, signal: string) => {
                 if (timer) {
                     clearTimeout(timer)
                 }

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.13.2] 2026-06-01
+
+### Fixes
+
+- Fix race condition where the TAP plan line could be missed if the child process emitted `exit` before all stdout data was flushed: switched from `exit` to `close` event, which fires only after all stdio streams are fully closed
+
 ## [1.13.1] 2026-05-26
 
 ### Fixes
