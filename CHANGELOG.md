@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Dependencies
+
+- Update glob 13.0.0 → 13.0.6
+- Update tap-parser 18.0.3 → 18.3.4
+
 ## [1.13.2] 2026-06-01
 
 ### Fixes
