@@ -53,14 +53,15 @@ export async function runBeforeEach(
         output += data
     })
 
-    const tapResult = await new Promise<FinalResults>((resolve) => {
-        const p = new Parser(resolve)
-        proc.stdout.pipe(p)
-    })
-
-    const exitCode = await new Promise<number>((resolve) => {
-        proc.on('exit', (code: number | null) => resolve(code ?? 1))
-    })
+    const [tapResult, exitCode] = await Promise.all([
+        new Promise<FinalResults>((resolve) => {
+            const p = new Parser(resolve)
+            proc.stdout.pipe(p)
+        }),
+        new Promise<number>((resolve) => {
+            proc.on('close', (code: number | null) => resolve(code ?? 1))
+        }),
+    ])
 
     const ok = tapResult.ok && exitCode === 0
     return { ok, output }
