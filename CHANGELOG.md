@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixes
 
 - Fix race condition where the TAP plan line could be missed if the child process emitted `exit` before all stdout data was flushed: switched from `exit` to `close` event, which fires only after all stdio streams are fully closed
+- Fix race condition in `runBeforeEach` on Linux where the `exit` event fired before stdout was fully drained, causing before-each failures to be silently ignored: use `Promise.all` to register both the TAP-parser and process-close listeners before any `await`
 
 ## [1.13.1] 2026-05-26
 
