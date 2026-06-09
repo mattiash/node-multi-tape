@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.14.0] 2026-06-09
+
 ### Features
 
 - Add `--runner=<cmd>` option to specify the command used to run test files (default: `node`). For example, `--runner=tsx` runs each test as `tsx <testfile>`.
