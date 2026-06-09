@@ -17,6 +17,7 @@ test("Glob parses this project's test/*.ts", async (t) => {
             'test/test-never-exit.ts',
             'test/test-passthrough.ts',
             'test/test-retry.ts',
+            'test/test-runner.ts',
         ],
         'shall return an array of filenames'
     )
@@ -51,6 +52,7 @@ test('A combination of different inputs', (t) => {
         'test/test-never-exit.ts',
         'test/test-passthrough.ts',
         'test/test-retry.ts',
+        'test/test-runner.ts',
         'wibble/*.wibblet',
         'wibble/wibble123.example',
     ])

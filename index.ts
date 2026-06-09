@@ -22,11 +22,12 @@ const argv = parseArgs<{
     executors: string
     'before-each': string
     retry: number
+    runner: string
     '--': string[]
 }>(process.argv.slice(2), {
     boolean: ['o', 'j', 'q', 'e', 'update-timings'],
-    string: ['O', 'executors', 'before-each'],
-    default: { p: 1, t: 0, retry: 0 },
+    string: ['O', 'executors', 'before-each', 'runner'],
+    default: { p: 1, t: 0, retry: 0, runner: 'node' },
     '--': true,
 })
 
@@ -120,6 +121,7 @@ Options:
   -q                  Quiet mode - only show test results as they complete
   -e                  Errors-only mode - only show output from failing tests
   --retry=<N>         Retry failing tests up to N times (tap files: .tap, .retry1.tap, ...)
+  --runner=<cmd>      Command used to run each test file (default: node); e.g. --runner=tsx
   --before-each=<cmd> Run a command before each test; test is skipped if the command fails
   --controller=<cmd>  Run a command before tests, kill it when done
   --update-timings    Write .multi-tape-timing.json with per-test runtimes after a clean run
@@ -253,7 +255,8 @@ async function thread(executorName?: string): Promise<number> {
                     argv.O,
                     passthroughArgs,
                     executorName,
-                    retryNumber
+                    retryNumber,
+                    argv.runner
                 )
 
                 const failed = result.exitCode !== 0 || !result.result.ok

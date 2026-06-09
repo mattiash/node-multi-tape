@@ -81,7 +81,8 @@ export async function runTest(
     outputDir?: string,
     extraArgs: string[] = [],
     executor?: string,
-    retryNumber: number = 0
+    retryNumber: number = 0,
+    runner: string = 'node'
 ): Promise<Result> {
     const extraEnv = {} as Record<string, string>
     if (junitOutput) {
@@ -96,7 +97,7 @@ export async function runTest(
 
     const startTime = Date.now()
 
-    const proc = spawn('node', [...nodeArgs, filename, ...extraArgs], {
+    const proc = spawn(runner, [...nodeArgs, filename, ...extraArgs], {
         env: {
             ...process.env,
             ...extraEnv,

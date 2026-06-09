@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Add `--runner=<cmd>` option to specify the command used to run test files (default: `node`). For example, `--runner=tsx` runs each test as `tsx <testfile>`.
+
 ### Dependencies
 
 - Update glob 13.0.0 → 13.0.6
