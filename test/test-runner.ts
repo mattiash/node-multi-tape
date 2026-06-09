@@ -21,4 +21,3 @@ test('runner: custom runner is used to run test files', async (t) => {
     ])
     t.equal(exitCode, 0, 'exits 0 when custom runner sets expected env var')
 })
-
