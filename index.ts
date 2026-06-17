@@ -156,6 +156,22 @@ const emptyPrefix = process.env.MT_NO_EMOJI ? '' : '   '
 const aborted = new Set<string>()
 let abortInProgress = false
 
+function tapFailReason(r: FinalResults, exitCode: number): string {
+    if (r.fail > 0) return ''
+    const parts: string[] = []
+    if (r.bailout) {
+        parts.push('bailed out')
+    } else if (r.plan.start === null) {
+        parts.push('no TAP plan in output')
+    } else {
+        parts.push('TAP validation failed')
+    }
+    if (exitCode !== 0) {
+        parts.push(`exit code ${exitCode}`)
+    }
+    return ` [${parts.join(', ')}]`
+}
+
 function printTestResult(file: string, res: Result) {
     const { exitCode, result: r, executionTime, signal } = res
     const timeStr = `${(executionTime / 1000).toFixed(1)}s`
@@ -173,7 +189,7 @@ function printTestResult(file: string, res: Result) {
     } else {
         if (!r.ok) {
             console.log(
-                `${failPrefix}FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}`
+                `${failPrefix}FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}${tapFailReason(r, exitCode)}`
             )
         } else if (signal) {
             console.log(

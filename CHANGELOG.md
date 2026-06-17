@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Show reason in FAIL output when a test has no assertion failures but TAP validation fails (e.g. `[no TAP plan in output]`, `[bailed out]`, `[TAP validation failed]`)
+
 ## [1.14.0] 2026-06-09
 
 ### Features
