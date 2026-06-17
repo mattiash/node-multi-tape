@@ -21,6 +21,7 @@ export interface Result {
     executionTime: number
     result: FinalResults
     signal: string
+    timedOut?: boolean
     beforeEachFailed?: boolean
     beforeEachFile?: string
     retries?: FailedAttempt[]
@@ -204,5 +205,6 @@ export async function runTest(
         executionTime: endTime - startTime,
         result,
         signal,
+        timedOut: aborted,
     }
 }

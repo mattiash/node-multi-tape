@@ -156,7 +156,12 @@ const emptyPrefix = process.env.MT_NO_EMOJI ? '' : '   '
 const aborted = new Set<string>()
 let abortInProgress = false
 
-function tapFailReason(r: FinalResults, exitCode: number): string {
+function tapFailReason(
+    r: FinalResults,
+    exitCode: number,
+    timedOut: boolean
+): string {
+    if (timedOut) return ' [timed out]'
     if (r.fail > 0) return ''
     const parts: string[] = []
     if (r.bailout) {
@@ -173,7 +178,7 @@ function tapFailReason(r: FinalResults, exitCode: number): string {
 }
 
 function printTestResult(file: string, res: Result) {
-    const { exitCode, result: r, executionTime, signal } = res
+    const { exitCode, result: r, executionTime, signal, timedOut } = res
     const timeStr = `${(executionTime / 1000).toFixed(1)}s`
 
     if (res.beforeEachFailed) {
@@ -189,11 +194,11 @@ function printTestResult(file: string, res: Result) {
     } else {
         if (!r.ok) {
             console.log(
-                `${failPrefix}FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}${tapFailReason(r, exitCode)}`
+                `${failPrefix}FAIL ${file} (${timeStr}) ${r.pass || 0}/${r.count || 0}${tapFailReason(r, exitCode, timedOut ?? false)}`
             )
         } else if (signal) {
             console.log(
-                `${failPrefix}FAIL ${file} exited with signal ${signal}`
+                `${failPrefix}FAIL ${file} exited with signal ${signal}${timedOut ? ' [timed out]' : ''}`
             )
         } else {
             console.log(

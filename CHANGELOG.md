@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Show `[timed out]` reason in FAIL output when a test is killed by the `-t` timeout
+
 ## [1.15.0] 2026-06-17
 
 ### Features
