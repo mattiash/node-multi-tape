@@ -4,9 +4,14 @@ const tee = require('tee')
 import * as streams from 'stream-buffers'
 import { spawn } from 'child_process'
 import { createWriteStream } from 'fs'
-import { mkdir } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { basename, dirname } from 'path'
 import { Writable } from 'stream'
+import {
+    TapEvent,
+    buildXunitFromTapEvents,
+    prematureXunit,
+} from './xunit'
 
 const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
 
@@ -86,17 +91,12 @@ export async function runTest(
     runner: string = 'node'
 ): Promise<Result> {
     const extraEnv = {} as Record<string, string>
-    if (junitOutput) {
-        extraEnv.PT_XUNIT_FILE = outputDir
-            ? `${outputDir}${filename}.xml`
-            : filename + '.xml'
-        extraEnv.PT_XUNIT_NAME = basename(filename)
-    }
     if (executor !== undefined) {
         extraEnv.MULTI_TAPE_EXECUTOR = executor
     }
 
     const startTime = Date.now()
+    const xmlStartTime = new Date()
 
     const proc = spawn(runner, [...nodeArgs, filename, ...extraArgs], {
         env: {
@@ -152,6 +152,12 @@ export async function runTest(
     }
 
     const retrySuffix = retryNumber > 0 ? `.retry${retryNumber}` : ''
+    const xmlFilename = junitOutput
+        ? outputDir
+            ? `${outputDir}${filename}${retrySuffix}.xml`
+            : `${filename}${retrySuffix}.xml`
+        : undefined
+    const tapEvents: TapEvent[] = []
 
     // Create directory structure if needed
     if (outputToFile && outputDir) {
@@ -160,8 +166,22 @@ export async function runTest(
         await mkdir(tapDir, { recursive: true })
     }
 
+    if (xmlFilename) {
+        await mkdir(dirname(xmlFilename), { recursive: true })
+        await writeFile(xmlFilename, prematureXunit(basename(filename), xmlStartTime))
+    }
+
     const parsed = new Promise<FinalResults>((resolve) => {
         const p = new Parser(resolve)
+
+        if (junitOutput) {
+            p.on('comment', (comment: string) => {
+                tapEvents.push({ type: 'comment', data: comment })
+            })
+            p.on('assert', (result) => {
+                tapEvents.push({ type: 'assert', data: result })
+            })
+        }
 
         if (outputToFile) {
             const tapFilename = outputDir
@@ -182,6 +202,18 @@ export async function runTest(
     const { signal } = exitedResult
     const endTime = Date.now()
     const result = await parsed
+
+    if (xmlFilename) {
+        await writeFile(
+            xmlFilename,
+            buildXunitFromTapEvents(
+                tapEvents,
+                basename(filename),
+                xmlStartTime
+            )
+        )
+    }
+
     if (aborted) {
         exitCode = exitCode || 1
     }

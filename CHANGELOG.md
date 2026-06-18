@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Features
+
+- Generate JUnit XML files directly from parsed TAP output in multi-tape when `-j` is used,
+  replacing the previous approach of delegating XML generation to purple-tape via `PT_XUNIT_FILE`.
+  XML files are named after the test file with an `.xml` suffix and are always written — including
+  for each retry attempt and even when TAP parsing fails entirely.
+
 ## [1.16.0] 2026-06-18
 
 ### Features
