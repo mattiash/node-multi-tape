@@ -167,4 +167,3 @@ export function prematureXunit(name: string, startTime: Date): string {
 </testsuite>
 </testsuites>`
 }
-

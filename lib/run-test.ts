@@ -7,11 +7,7 @@ import { createWriteStream } from 'fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { basename, dirname } from 'path'
 import { Writable } from 'stream'
-import {
-    TapEvent,
-    buildXunitFromTapEvents,
-    prematureXunit,
-} from './xunit'
+import { TapEvent, buildXunitFromTapEvents, prematureXunit } from './xunit'
 
 const failPrefix = process.env.MT_NO_EMOJI ? '' : '❌ '
 
@@ -168,7 +164,10 @@ export async function runTest(
 
     if (xmlFilename) {
         await mkdir(dirname(xmlFilename), { recursive: true })
-        await writeFile(xmlFilename, prematureXunit(basename(filename), xmlStartTime))
+        await writeFile(
+            xmlFilename,
+            prematureXunit(basename(filename), xmlStartTime)
+        )
     }
 
     const parsed = new Promise<FinalResults>((resolve) => {
@@ -206,11 +205,7 @@ export async function runTest(
     if (xmlFilename) {
         await writeFile(
             xmlFilename,
-            buildXunitFromTapEvents(
-                tapEvents,
-                basename(filename),
-                xmlStartTime
-            )
+            buildXunitFromTapEvents(tapEvents, basename(filename), xmlStartTime)
         )
     }
 
