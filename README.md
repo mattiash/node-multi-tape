@@ -49,9 +49,11 @@ with output sent to stdout and print a summary at the end
   6 tests in parallel (1.5 × 4 = 6). The result is rounded down and will always be
   at least 1. Cannot be used together with `-p`.
 
-- -j Pass in environment variables to purple-tape to make it produce
-  a junit xml-file. The output filename will be the name
-  of the test-file with '.xml' appended.
+- -j Generate a JUnit XML file for each test file. The output filename is the name
+  of the test-file with '.xml' appended (e.g. `test/foo.js.xml`). When combined
+  with `-O`, XML files are written into the output directory alongside the `.tap`
+  files. XML files are always written — including for each retry attempt and even
+  if the test process crashes with no TAP output.
 
 - -t 10000 Timeout in ms for how long each test-file is allowed to run. Default is no timeout.
 

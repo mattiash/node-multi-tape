@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.17.0] 2026-06-18
+
 ### Features
 
 - Generate JUnit XML files directly from parsed TAP output in multi-tape when `-j` is used,
