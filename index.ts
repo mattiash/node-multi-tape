@@ -162,14 +162,16 @@ function tapFailReason(
     timedOut: boolean
 ): string {
     if (timedOut) return ' [timed out]'
-    if (r.fail > 0) return ''
     const parts: string[] = []
     if (r.bailout) {
         parts.push('bailed out')
     } else if (r.plan.start === null) {
         parts.push('no TAP plan in output')
-    } else {
+    } else if (r.fail === 0) {
         parts.push('TAP validation failed')
+    } else {
+        // Assertion failures with a valid plan are self-evident in the TAP output
+        return ''
     }
     if (exitCode !== 0) {
         parts.push(`exit code ${exitCode}`)

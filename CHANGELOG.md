@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixes
+
+- Fix FAIL summary line showing no reason in brackets when the TAP plan line is missing but the
+  tap-parser still increments the fail counter (via an internal TAP format error). Previously,
+  `tapFailReason` short-circuited on `r.fail > 0` before checking for missing plan or bailout,
+  so those reasons were silently dropped. Now TAP format issues (no plan, bailout) are always
+  surfaced; only genuine assertion failures with a valid plan suppress the reason bracket.
+
 ## [1.17.0] 2026-06-18
 
 ### Features
