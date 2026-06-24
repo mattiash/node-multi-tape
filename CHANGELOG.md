@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.17.1] 2026-06-24
+
 ### Fixes
 
 - Fix FAIL summary line showing no reason in brackets when the TAP plan line is missing but the
