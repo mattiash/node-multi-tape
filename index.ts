@@ -19,13 +19,14 @@ const argv = parseArgs<{
     q: boolean
     e: boolean
     'update-timings': boolean
+    'failures-last': boolean
     executors: string
     'before-each': string
     retry: number
     runner: string
     '--': string[]
 }>(process.argv.slice(2), {
-    boolean: ['o', 'j', 'q', 'e', 'update-timings'],
+    boolean: ['o', 'j', 'q', 'e', 'update-timings', 'failures-last'],
     string: ['O', 'executors', 'before-each', 'runner'],
     default: { p: 1, t: 0, retry: 0, runner: 'node' },
     '--': true,
@@ -125,6 +126,7 @@ Options:
   --before-each=<cmd> Run a command before each test; test is skipped if the command fails
   --controller=<cmd>  Run a command before tests, kill it when done
   --update-timings    Write .multi-tape-timing.json with per-test runtimes after a clean run
+  --failures-last     Sort the summary so that failures appear last
   -- <args>           Pass remaining arguments to each test file
 
 Examples:
@@ -434,7 +436,8 @@ function printSummary() {
     let success = true
     console.log('')
     for (const [file, res] of [...results.entries()].sort(
-        (a, b) => a[1].exitCode - b[1].exitCode ||
+        (a, b) =>
+            (argv['failures-last'] ? a[1].exitCode - b[1].exitCode : 0) ||
             a[1].executionTime - b[1].executionTime
     )) {
         printTestResult(file, res)

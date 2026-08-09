@@ -70,6 +70,8 @@ with output sent to stdout and print a summary at the end
 
   If `.multi-tape-timing.json` already exists it is read automatically at startup and tests are reordered slowest-first to minimise total wall time. Test files not present in the file are assumed to be fast and run last.
 
+- --failures-last Change the sort order of test results in the summary so that results for failed tests appear after results for passing tests.
+
 - --retry=N Retry each failing test up to N times. A `🔄 RETRY` status line is printed immediately when a test fails and will be retried. Tap files for each attempt are named differently to preserve them all: the original attempt uses the normal `.tap` name, and retries use `.retry1.tap`, `.retry2.tap`, and so on.
 
 - --before-each="command" Run a shell command before each test file (and before each retry attempt). The command must produce TAP output. If it exits non-zero or its TAP output contains a failure, the test is not run and is reported as failed. The environment variable `MULTI_TAPE_EXECUTOR` is set when `--executors` is also in use.
@@ -88,7 +90,7 @@ with output sent to stdout and print a summary at the end
 
 ## Summary output
 
-At the end of every run multi-tape prints the total wall-clock runtime. When running with `-p` or `-P`, it also prints how long each executor was idle at the end — a large idle time indicates that reordering tests with `--update-timings` could reduce the total runtime.
+At the end of every run multi-tape prints the total wall-clock runtime. When running with `-p` or `-P`, it also prints how long each executor was idle at the end — a large idle time indicates that reordering tests with `--update-timings` could reduce the total runtime. With `--failures-last` results for failed tests are printed after results for passed tests.
 
 ## Exit code
 
