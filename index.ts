@@ -436,9 +436,10 @@ async function run() {
 function printSummary() {
     let success = true
     if (!argv.q) {
-        console.log('')
+        console.log('test')
         for (const [file, res] of [...results.entries()].sort(
-            (a, b) => a[1].executionTime - b[1].executionTime
+            (a, b) => a[1].exitCode - b[1].exitCode ||
+                a[1].executionTime - b[1].executionTime
         )) {
             printTestResult(file, res)
             if (res.exitCode !== 0 || !res.result.ok) {
