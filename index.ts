@@ -318,9 +318,6 @@ async function thread(executorName?: string): Promise<number> {
             inProgress.delete(file)
             results.set(file, result)
             lastCompletionTime = Date.now()
-            if (argv.q) {
-                printTestResult(file, result)
-            }
         }
     }
     return lastCompletionTime
@@ -435,34 +432,24 @@ async function run() {
 
 function printSummary() {
     let success = true
-    if (!argv.q) {
-        console.log('')
-        let totalPass = 0;
-        let totalCount = 0;
-        for (const [file, res] of [...results.entries()].sort(
-            (a, b) => a[1].executionTime - b[1].executionTime
-        )) {
-            printTestResult(file, res)
-            if (res.exitCode !== 0 || !res.result.ok) {
-                success = false
-            }
-            const { result: r } = res
-            totalPass += r.pass;
-            totalCount += r.count;
+    console.log('')
+    let totalPass = 0;
+    let totalCount = 0;
+    for (const [file, res] of [...results.entries()].sort(
+        (a, b) => a[1].executionTime - b[1].executionTime
+    )) {
+        printTestResult(file, res)
+        if (res.exitCode !== 0 || !res.result.ok) {
+            success = false
         }
-        if (success && totalPass === totalCount) {
-          console.log(`${okPrefix}OK   Total ${totalPass}/${totalCount}`)
-        } else {
-          console.log(`${failPrefix}FAIL Total ${totalPass}/${totalCount}`)
-        }
-
+        const { result: r } = res
+        totalPass += r.pass;
+        totalCount += r.count;
+    }
+    if (success && totalPass === totalCount) {
+      console.log(`${okPrefix}OK   Total ${totalPass}/${totalCount}`)
     } else {
-        // In quiet mode, just check for failures
-        for (const [, res] of results.entries()) {
-            if (res.exitCode !== 0 || !res.result.ok) {
-                success = false
-            }
-        }
+      console.log(`${failPrefix}FAIL Total ${totalPass}/${totalCount}`)
     }
 
     if (runStartTime > 0) {
