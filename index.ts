@@ -437,6 +437,8 @@ function printSummary() {
     let success = true
     if (!argv.q) {
         console.log('')
+        let totalPass = 0;
+        let totalCount = 0;
         for (const [file, res] of [...results.entries()].sort(
             (a, b) => a[1].executionTime - b[1].executionTime
         )) {
@@ -444,7 +446,16 @@ function printSummary() {
             if (res.exitCode !== 0 || !res.result.ok) {
                 success = false
             }
+            const { result: r } = res
+            totalPass += r.pass;
+            totalCount += r.count;
         }
+        if (success && totalPass === totalCount) {
+          console.log(`${okPrefix}OK   Total ${totalPass}/${totalCount}`)
+        } else {
+          console.log(`${failPrefix}FAIL Total ${totalPass}/${totalCount}`)
+        }
+
     } else {
         // In quiet mode, just check for failures
         for (const [, res] of results.entries()) {
