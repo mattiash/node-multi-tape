@@ -320,6 +320,9 @@ async function thread(executorName?: string): Promise<number> {
             inProgress.delete(file)
             results.set(file, result)
             lastCompletionTime = Date.now()
+            if (argv.q) {
+                printTestResult(file, result)
+            }
         }
     }
     return lastCompletionTime
@@ -434,15 +437,24 @@ async function run() {
 
 function printSummary() {
     let success = true
-    console.log('')
-    for (const [file, res] of [...results.entries()].sort(
-        (a, b) =>
-            (argv['failures-last'] ? a[1].exitCode - b[1].exitCode : 0) ||
-            a[1].executionTime - b[1].executionTime
-    )) {
-        printTestResult(file, res)
-        if (res.exitCode !== 0 || !res.result.ok) {
-            success = false
+    if (!argv.q) {
+        console.log('')
+        for (const [file, res] of [...results.entries()].sort(
+            (a, b) =>
+                (argv['failures-last'] ? a[1].exitCode - b[1].exitCode : 0) ||
+                a[1].executionTime - b[1].executionTime
+        )) {
+            printTestResult(file, res)
+            if (res.exitCode !== 0 || !res.result.ok) {
+                success = false
+            }
+        }
+    } else {
+        // In quiet mode, just check for failures
+        for (const [, res] of results.entries()) {
+            if (res.exitCode !== 0 || !res.result.ok) {
+                success = false
+            }
         }
     }
 
